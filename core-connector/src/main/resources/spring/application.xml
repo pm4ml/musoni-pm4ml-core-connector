@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:encryption="http://www.jasypt.org/schema/encryption"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+            http://www.jasypt.org/schema/encryption http://www.jasypt.org/schema/encryption/jasypt-spring31-encryption-1.xsd
+            ">
+
+    <!--    <bean id="jasypt" class="org.apache.camel.component.jasypt.JasyptPropertiesParser">-->
+    <!--        <property name="password" value="secret"/>-->
+    <!--    </bean>-->
+
+    <!-- PROPERTIES FROM YAML FILE -->
+    <bean id="applicationProperties" class="org.springframework.beans.factory.config.YamlPropertiesFactoryBean">
+        <property name="resources" value="classpath:application.yml"/>
+        <!--        <property name="propertiesParserRef" value="jasypt"/>-->
+    </bean>
+
+    <context:property-placeholder properties-ref="applicationProperties"/>
+    <!--    <encryption:encryptable-property-placeholder encryptor="jasypt" properties-ref="applicationProperties"/>-->
+
+    <import resource="classpath:spring/cxf.xml"/>
+    <import resource="classpath:spring/mappings.xml"/>
+
+</beans>

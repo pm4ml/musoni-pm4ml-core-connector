@@ -1,0 +1,221 @@
+{
+	"info": {
+		"_postman_id": "36ac56e3-dd86-4cad-bd85-c0011d126cb2",
+		"name": "Wallet DFSP - loan repayment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Example request - sample data",
+			"item": [
+				{
+					"name": "1. /sendmoney",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"homeTransactionId\": \"b51ec534-ee48-4575-b6a9-ead2751b6052\",\n    \"from\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"44123456789\",\n        \"type\": \"CONSUMER\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\", \n        \"idValue\": \"17039811907\"\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"MMK\",\n    \"amount\": \"100\",\n    \"transactionType\": \"TRANSFER\",\n    \"note\": \"test payment\"\n}"
+						},
+						"url": {
+							"raw": "{{core-connector}}:{{core-connector-port}}/sendmoney",
+							"host": [
+								"{{core-connector}}"
+							],
+							"port": "{{core-connector-port}}",
+							"path": [
+								"sendmoney"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "POST /sendmoney -  200 OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"homeTransactionId\": \"b51ec534-ee48-4575-b6a9-ead2751b6052\",\n    \"from\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"44123456789\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\", \n        \"idValue\": \"17039811907\"\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"MMK\",\n    \"amount\": \"100\",\n    \"transactionType\": \"TRANSFER\",\n    \"note\": \"test payment\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{core-connector}}:{{core-connector-port}}/sendmoney",
+									"host": [
+										"{{core-connector}}"
+									],
+									"port": "{{core-connector-port}}",
+									"path": [
+										"sendmoney"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 17 Jun 2021 07:42:24 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Accept",
+									"value": "*/*"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Accept-Encoding",
+									"value": "gzip, deflate, br"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Server",
+									"value": "Jetty(9.4.26.v20200117)"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"from\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"44123456789\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"17039811907\",\n        \"fspId\": \"payeefsp\",\n        \"firstName\": \"SimFirst\",\n        \"middleName\": \"SimMiddle\",\n        \"lastName\": \"SimLast\",\n        \"dateOfBirth\": \"2010-10-10\"\n    },\n    \"homeTransactionId\": \"b51ec534-ee48-4575-b6a9-ead2751b6052\",\n    \"amountType\": \"SEND\",\n    \"currency\": \"MMK\",\n    \"amount\": \"100\",\n    \"transactionType\": \"TRANSFER\",\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": [],\n    \"transferRequestExtensions\": [],\n    \"transferId\": \"7dd68009-3ff3-4c0d-a498-007bb6963b0b\",\n    \"currentState\": \"WAITING_FOR_QUOTE_ACCEPTANCE\",\n    \"initiatedTimestamp\": \"2021-06-17T07:42:24.728Z\",\n    \"direction\": \"OUTBOUND\",\n    \"getPartiesRequest\": {\n        \"method\": \"GET\",\n        \"host\": \"payeefsp-mojaloop-connector\",\n        \"port\": \"4000\",\n        \"path\": \"/parties/ACCOUNT_ID/17039811907\",\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.parties+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payerfsp\",\n            \"Authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"accept\": \"application/vnd.interoperability.parties+json;version=1\"\n        },\n        \"agent\": \"[REDACTED]\",\n        \"body\": null\n    },\n    \"getPartiesResponse\": {\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.parties+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payeefsp\",\n            \"fspiop-destination\": \"payerfsp\",\n            \"authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"content-length\": 260,\n            \"host\": \"payerfsp-mojaloop-connector:4000\",\n            \"connection\": \"close\"\n        },\n        \"body\": {\n            \"party\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"17039811907\",\n                    \"fspId\": \"payeefsp\"\n                },\n                \"personalInfo\": {\n                    \"complexName\": {\n                        \"firstName\": \"SimFirst\",\n                        \"middleName\": \"SimMiddle\",\n                        \"lastName\": \"SimLast\"\n                    },\n                    \"dateOfBirth\": \"2010-10-10\"\n                },\n                \"name\": \"SimFirst SimLast\"\n            }\n        }\n    },\n    \"resume\": {\n        \"acceptParty\": true\n    },\n    \"quoteId\": \"c24d3bc7-494b-44bd-9a78-c62fa78466e0\",\n    \"quoteRequest\": {\n        \"method\": \"POST\",\n        \"host\": \"payeefsp-mojaloop-connector\",\n        \"port\": \"4000\",\n        \"path\": \"/quotes\",\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.quotes+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payerfsp\",\n            \"fspiop-destination\": \"payeefsp\",\n            \"Authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"accept\": \"application/vnd.interoperability.quotes+json;version=1\",\n            \"content-length\": 656\n        },\n        \"agent\": \"[REDACTED]\",\n        \"body\": \"{\\\"quoteId\\\":\\\"c24d3bc7-494b-44bd-9a78-c62fa78466e0\\\",\\\"transactionId\\\":\\\"7dd68009-3ff3-4c0d-a498-007bb6963b0b\\\",\\\"amountType\\\":\\\"SEND\\\",\\\"amount\\\":{\\\"currency\\\":\\\"MMK\\\",\\\"amount\\\":\\\"100\\\"},\\\"expiration\\\":\\\"2021-06-17T07:43:24.910Z\\\",\\\"payer\\\":{\\\"partyIdInfo\\\":{\\\"partyIdType\\\":\\\"ACCOUNT_ID\\\",\\\"partyIdentifier\\\":\\\"44123456789\\\",\\\"fspId\\\":\\\"payerfsp\\\"}},\\\"payee\\\":{\\\"partyIdInfo\\\":{\\\"partyIdType\\\":\\\"ACCOUNT_ID\\\",\\\"partyIdentifier\\\":\\\"17039811907\\\",\\\"fspId\\\":\\\"payeefsp\\\"},\\\"personalInfo\\\":{\\\"complexName\\\":{\\\"firstName\\\":\\\"SimFirst\\\",\\\"middleName\\\":\\\"SimMiddle\\\",\\\"lastName\\\":\\\"SimLast\\\"},\\\"dateOfBirth\\\":\\\"2010-10-10\\\"}},\\\"transactionType\\\":{\\\"scenario\\\":\\\"TRANSFER\\\",\\\"initiator\\\":\\\"PAYER\\\",\\\"initiatorType\\\":\\\"CONSUMER\\\"},\\\"note\\\":\\\"test payment\\\"}\"\n    },\n    \"quoteResponse\": {\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.quotes+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payeefsp\",\n            \"fspiop-destination\": \"payerfsp\",\n            \"authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"content-length\": 1352,\n            \"host\": \"payerfsp-mojaloop-connector:4000\",\n            \"connection\": \"close\"\n        },\n        \"body\": {\n            \"transferAmount\": {\n                \"amount\": \"100\",\n                \"currency\": \"MMK\"\n            },\n            \"expiration\": \"2021-06-17T07:43:24.935Z\",\n            \"ilpPacket\": \"AYIDLAAAAAAAACcQIWcucGF5ZWVmc3AuYWNjb3VudF9pZC4xNzAzOTgxMTkwN4IC_mV5SjBjbUZ1YzJGamRHbHZia2xrSWpvaU4yUmtOamd3TURrdE0yWm1NeTAwWXpCa0xXRTBPVGd0TURBM1ltSTJPVFl6WWpCaUlpd2ljWFZ2ZEdWSlpDSTZJbU15TkdRelltTTNMVFE1TkdJdE5EUmlaQzA1WVRjNExXTTJNbVpoTnpnME5qWmxNQ0lzSW5CaGVXVmxJanA3SW5CaGNuUjVTV1JKYm1adklqcDdJbkJoY25SNVNXUlVlWEJsSWpvaVFVTkRUMVZPVkY5SlJDSXNJbkJoY25SNVNXUmxiblJwWm1sbGNpSTZJakUzTURNNU9ERXhPVEEzSWl3aVpuTndTV1FpT2lKd1lYbGxaV1p6Y0NKOUxDSndaWEp6YjI1aGJFbHVabThpT25zaVkyOXRjR3hsZUU1aGJXVWlPbnNpWm1seWMzUk9ZVzFsSWpvaVUybHRSbWx5YzNRaUxDSnRhV1JrYkdWT1lXMWxJam9pVTJsdFRXbGtaR3hsSWl3aWJHRnpkRTVoYldVaU9pSlRhVzFNWVhOMEluMHNJbVJoZEdWUFprSnBjblJvSWpvaU1qQXhNQzB4TUMweE1DSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lKQlEwTlBWVTVVWDBsRUlpd2ljR0Z5ZEhsSlpHVnVkR2xtYVdWeUlqb2lORFF4TWpNME5UWTNPRGtpTENKbWMzQkpaQ0k2SW5CaGVXVnlabk53SW4xOUxDSmhiVzkxYm5RaU9uc2lZVzF2ZFc1MElqb2lNVEF3SWl3aVkzVnljbVZ1WTNraU9pSk5UVXNpZlN3aWRISmhibk5oWTNScGIyNVVlWEJsSWpwN0luTmpaVzVoY21sdklqb2lWRkpCVGxOR1JWSWlMQ0pwYm1sMGFXRjBiM0lpT2lKUVFWbEZVaUlzSW1sdWFYUnBZWFJ2Y2xSNWNHVWlPaUpEVDA1VFZVMUZVaUo5ZlEA\",\n            \"condition\": \"-_r1hLYYwwRRsQrl9UX49SD3cRGqRyCwu_5cgbG2EMg\",\n            \"payeeFspFee\": {\n                \"amount\": \"5\",\n                \"currency\": \"MMK\"\n            },\n            \"payeeFspCommission\": {\n                \"amount\": \"5\",\n                \"currency\": \"MMK\"\n            }\n        }\n    },\n    \"quoteResponseSource\": \"payeefsp\"\n}"
+						}
+					]
+				},
+				{
+					"name": "2. /sendmoney/{transferId}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"acceptQuote\": true\n}"
+						},
+						"url": {
+							"raw": "{{core-connector}}:{{core-connector-port}}/sendmoney/7dd68009-3ff3-4c0d-a498-007bb6963b0b",
+							"host": [
+								"{{core-connector}}"
+							],
+							"port": "{{core-connector-port}}",
+							"path": [
+								"sendmoney",
+								"7dd68009-3ff3-4c0d-a498-007bb6963b0b"
+							]
+						},
+						"description": "\"transferId\" is taken from the response body of POST /sendmoney"
+					},
+					"response": [
+						{
+							"name": "PUT /sendmoney/{transferId} - 200 OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"acceptQuote\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{core-connector}}:{{core-connector-port}}/sendmoney/7dd68009-3ff3-4c0d-a498-007bb6963b0b",
+									"host": [
+										"{{core-connector}}"
+									],
+									"port": "{{core-connector-port}}",
+									"path": [
+										"sendmoney",
+										"7dd68009-3ff3-4c0d-a498-007bb6963b0b"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 17 Jun 2021 07:46:50 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Accept",
+									"value": "*/*"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "transferId",
+									"value": "7dd68009-3ff3-4c0d-a498-007bb6963b0b"
+								},
+								{
+									"key": "Accept-Encoding",
+									"value": "gzip, deflate, br"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Server",
+									"value": "Jetty(9.4.26.v20200117)"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"from\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"44123456789\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"17039811907\",\n        \"fspId\": \"payeefsp\",\n        \"firstName\": \"SimFirst\",\n        \"middleName\": \"SimMiddle\",\n        \"lastName\": \"SimLast\",\n        \"dateOfBirth\": \"2010-10-10\"\n    },\n    \"homeTransactionId\": \"b51ec534-ee48-4575-b6a9-ead2751b6052\",\n    \"amountType\": \"SEND\",\n    \"currency\": \"MMK\",\n    \"amount\": \"100\",\n    \"transactionType\": \"TRANSFER\",\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": [],\n    \"transferRequestExtensions\": [],\n    \"transferId\": \"7dd68009-3ff3-4c0d-a498-007bb6963b0b\",\n    \"currentState\": \"COMPLETED\",\n    \"initiatedTimestamp\": \"2021-06-17T07:42:24.728Z\",\n    \"direction\": \"OUTBOUND\",\n    \"getPartiesRequest\": {\n        \"method\": \"GET\",\n        \"host\": \"payeefsp-mojaloop-connector\",\n        \"port\": \"4000\",\n        \"path\": \"/parties/ACCOUNT_ID/17039811907\",\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.parties+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payerfsp\",\n            \"Authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"accept\": \"application/vnd.interoperability.parties+json;version=1\"\n        },\n        \"agent\": \"[REDACTED]\",\n        \"body\": null\n    },\n    \"getPartiesResponse\": {\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.parties+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payeefsp\",\n            \"fspiop-destination\": \"payerfsp\",\n            \"authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"content-length\": 260,\n            \"host\": \"payerfsp-mojaloop-connector:4000\",\n            \"connection\": \"close\"\n        },\n        \"body\": {\n            \"party\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"17039811907\",\n                    \"fspId\": \"payeefsp\"\n                },\n                \"personalInfo\": {\n                    \"complexName\": {\n                        \"firstName\": \"SimFirst\",\n                        \"middleName\": \"SimMiddle\",\n                        \"lastName\": \"SimLast\"\n                    },\n                    \"dateOfBirth\": \"2010-10-10\"\n                },\n                \"name\": \"SimFirst SimLast\"\n            }\n        }\n    },\n    \"resume\": {\n        \"acceptParty\": true,\n        \"acceptQuote\": true\n    },\n    \"quoteId\": \"c24d3bc7-494b-44bd-9a78-c62fa78466e0\",\n    \"quoteRequest\": {\n        \"method\": \"POST\",\n        \"host\": \"payeefsp-mojaloop-connector\",\n        \"port\": \"4000\",\n        \"path\": \"/quotes\",\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.quotes+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payerfsp\",\n            \"fspiop-destination\": \"payeefsp\",\n            \"Authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"accept\": \"application/vnd.interoperability.quotes+json;version=1\",\n            \"content-length\": 656\n        },\n        \"agent\": \"[REDACTED]\",\n        \"body\": \"{\\\"quoteId\\\":\\\"c24d3bc7-494b-44bd-9a78-c62fa78466e0\\\",\\\"transactionId\\\":\\\"7dd68009-3ff3-4c0d-a498-007bb6963b0b\\\",\\\"amountType\\\":\\\"SEND\\\",\\\"amount\\\":{\\\"currency\\\":\\\"MMK\\\",\\\"amount\\\":\\\"100\\\"},\\\"expiration\\\":\\\"2021-06-17T07:43:24.910Z\\\",\\\"payer\\\":{\\\"partyIdInfo\\\":{\\\"partyIdType\\\":\\\"ACCOUNT_ID\\\",\\\"partyIdentifier\\\":\\\"44123456789\\\",\\\"fspId\\\":\\\"payerfsp\\\"}},\\\"payee\\\":{\\\"partyIdInfo\\\":{\\\"partyIdType\\\":\\\"ACCOUNT_ID\\\",\\\"partyIdentifier\\\":\\\"17039811907\\\",\\\"fspId\\\":\\\"payeefsp\\\"},\\\"personalInfo\\\":{\\\"complexName\\\":{\\\"firstName\\\":\\\"SimFirst\\\",\\\"middleName\\\":\\\"SimMiddle\\\",\\\"lastName\\\":\\\"SimLast\\\"},\\\"dateOfBirth\\\":\\\"2010-10-10\\\"}},\\\"transactionType\\\":{\\\"scenario\\\":\\\"TRANSFER\\\",\\\"initiator\\\":\\\"PAYER\\\",\\\"initiatorType\\\":\\\"CONSUMER\\\"},\\\"note\\\":\\\"test payment\\\"}\"\n    },\n    \"quoteResponse\": {\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.quotes+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:42:24 GMT\",\n            \"fspiop-source\": \"payeefsp\",\n            \"fspiop-destination\": \"payerfsp\",\n            \"authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"content-length\": 1352,\n            \"host\": \"payerfsp-mojaloop-connector:4000\",\n            \"connection\": \"close\"\n        },\n        \"body\": {\n            \"transferAmount\": {\n                \"amount\": \"100\",\n                \"currency\": \"MMK\"\n            },\n            \"expiration\": \"2021-06-17T07:43:24.935Z\",\n            \"ilpPacket\": \"AYIDLAAAAAAAACcQIWcucGF5ZWVmc3AuYWNjb3VudF9pZC4xNzAzOTgxMTkwN4IC_mV5SjBjbUZ1YzJGamRHbHZia2xrSWpvaU4yUmtOamd3TURrdE0yWm1NeTAwWXpCa0xXRTBPVGd0TURBM1ltSTJPVFl6WWpCaUlpd2ljWFZ2ZEdWSlpDSTZJbU15TkdRelltTTNMVFE1TkdJdE5EUmlaQzA1WVRjNExXTTJNbVpoTnpnME5qWmxNQ0lzSW5CaGVXVmxJanA3SW5CaGNuUjVTV1JKYm1adklqcDdJbkJoY25SNVNXUlVlWEJsSWpvaVFVTkRUMVZPVkY5SlJDSXNJbkJoY25SNVNXUmxiblJwWm1sbGNpSTZJakUzTURNNU9ERXhPVEEzSWl3aVpuTndTV1FpT2lKd1lYbGxaV1p6Y0NKOUxDSndaWEp6YjI1aGJFbHVabThpT25zaVkyOXRjR3hsZUU1aGJXVWlPbnNpWm1seWMzUk9ZVzFsSWpvaVUybHRSbWx5YzNRaUxDSnRhV1JrYkdWT1lXMWxJam9pVTJsdFRXbGtaR3hsSWl3aWJHRnpkRTVoYldVaU9pSlRhVzFNWVhOMEluMHNJbVJoZEdWUFprSnBjblJvSWpvaU1qQXhNQzB4TUMweE1DSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lKQlEwTlBWVTVVWDBsRUlpd2ljR0Z5ZEhsSlpHVnVkR2xtYVdWeUlqb2lORFF4TWpNME5UWTNPRGtpTENKbWMzQkpaQ0k2SW5CaGVXVnlabk53SW4xOUxDSmhiVzkxYm5RaU9uc2lZVzF2ZFc1MElqb2lNVEF3SWl3aVkzVnljbVZ1WTNraU9pSk5UVXNpZlN3aWRISmhibk5oWTNScGIyNVVlWEJsSWpwN0luTmpaVzVoY21sdklqb2lWRkpCVGxOR1JWSWlMQ0pwYm1sMGFXRjBiM0lpT2lKUVFWbEZVaUlzSW1sdWFYUnBZWFJ2Y2xSNWNHVWlPaUpEVDA1VFZVMUZVaUo5ZlEA\",\n            \"condition\": \"-_r1hLYYwwRRsQrl9UX49SD3cRGqRyCwu_5cgbG2EMg\",\n            \"payeeFspFee\": {\n                \"amount\": \"5\",\n                \"currency\": \"MMK\"\n            },\n            \"payeeFspCommission\": {\n                \"amount\": \"5\",\n                \"currency\": \"MMK\"\n            }\n        }\n    },\n    \"quoteResponseSource\": \"payeefsp\",\n    \"prepare\": {\n        \"method\": \"POST\",\n        \"host\": \"payeefsp-mojaloop-connector\",\n        \"port\": \"4000\",\n        \"path\": \"/transfers\",\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.transfers+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:46:50 GMT\",\n            \"fspiop-source\": \"payerfsp\",\n            \"fspiop-destination\": \"payeefsp\",\n            \"Authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"accept\": \"application/vnd.interoperability.transfers+json;version=1\",\n            \"content-length\": 1341\n        },\n        \"agent\": \"[REDACTED]\",\n        \"body\": \"{\\\"transferId\\\":\\\"7dd68009-3ff3-4c0d-a498-007bb6963b0b\\\",\\\"payeeFsp\\\":\\\"payeefsp\\\",\\\"payerFsp\\\":\\\"payerfsp\\\",\\\"amount\\\":{\\\"currency\\\":\\\"MMK\\\",\\\"amount\\\":\\\"100\\\"},\\\"ilpPacket\\\":\\\"AYIDLAAAAAAAACcQIWcucGF5ZWVmc3AuYWNjb3VudF9pZC4xNzAzOTgxMTkwN4IC_mV5SjBjbUZ1YzJGamRHbHZia2xrSWpvaU4yUmtOamd3TURrdE0yWm1NeTAwWXpCa0xXRTBPVGd0TURBM1ltSTJPVFl6WWpCaUlpd2ljWFZ2ZEdWSlpDSTZJbU15TkdRelltTTNMVFE1TkdJdE5EUmlaQzA1WVRjNExXTTJNbVpoTnpnME5qWmxNQ0lzSW5CaGVXVmxJanA3SW5CaGNuUjVTV1JKYm1adklqcDdJbkJoY25SNVNXUlVlWEJsSWpvaVFVTkRUMVZPVkY5SlJDSXNJbkJoY25SNVNXUmxiblJwWm1sbGNpSTZJakUzTURNNU9ERXhPVEEzSWl3aVpuTndTV1FpT2lKd1lYbGxaV1p6Y0NKOUxDSndaWEp6YjI1aGJFbHVabThpT25zaVkyOXRjR3hsZUU1aGJXVWlPbnNpWm1seWMzUk9ZVzFsSWpvaVUybHRSbWx5YzNRaUxDSnRhV1JrYkdWT1lXMWxJam9pVTJsdFRXbGtaR3hsSWl3aWJHRnpkRTVoYldVaU9pSlRhVzFNWVhOMEluMHNJbVJoZEdWUFprSnBjblJvSWpvaU1qQXhNQzB4TUMweE1DSjlmU3dpY0dGNVpYSWlPbnNpY0dGeWRIbEpaRWx1Wm04aU9uc2ljR0Z5ZEhsSlpGUjVjR1VpT2lKQlEwTlBWVTVVWDBsRUlpd2ljR0Z5ZEhsSlpHVnVkR2xtYVdWeUlqb2lORFF4TWpNME5UWTNPRGtpTENKbWMzQkpaQ0k2SW5CaGVXVnlabk53SW4xOUxDSmhiVzkxYm5RaU9uc2lZVzF2ZFc1MElqb2lNVEF3SWl3aVkzVnljbVZ1WTNraU9pSk5UVXNpZlN3aWRISmhibk5oWTNScGIyNVVlWEJsSWpwN0luTmpaVzVoY21sdklqb2lWRkpCVGxOR1JWSWlMQ0pwYm1sMGFXRjBiM0lpT2lKUVFWbEZVaUlzSW1sdWFYUnBZWFJ2Y2xSNWNHVWlPaUpEVDA1VFZVMUZVaUo5ZlEA\\\",\\\"condition\\\":\\\"-_r1hLYYwwRRsQrl9UX49SD3cRGqRyCwu_5cgbG2EMg\\\",\\\"expiration\\\":\\\"2021-06-17T07:47:50.180Z\\\"}\"\n    },\n    \"fulfil\": {\n        \"body\": {\n            \"completedTimestamp\": \"2021-06-17T07:46:50.211Z\",\n            \"transferState\": \"RESERVED\",\n            \"fulfilment\": \"peavWYe0xAvtWQb6Gbl77-epTuXo1zSd59jdorA37rw\"\n        },\n        \"headers\": {\n            \"content-type\": \"application/vnd.interoperability.transfers+json;version=1.0\",\n            \"date\": \"Thu, 17 Jun 2021 07:46:50 GMT\",\n            \"fspiop-source\": \"payeefsp\",\n            \"fspiop-destination\": \"payerfsp\",\n            \"authorization\": \"Bearer 74b241a2-4200-3938-8dfc-0e26ba21dc22\",\n            \"content-length\": 135,\n            \"host\": \"payerfsp-mojaloop-connector:4000\",\n            \"connection\": \"close\"\n        }\n    }\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}

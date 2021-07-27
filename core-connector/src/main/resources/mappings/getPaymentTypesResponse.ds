@@ -1,0 +1,7 @@
+
+
+local paymentTypeFilteredArray = std.filter(function(paymentType) paymentType.name == header.paymentTypeName, payload);
+
+{
+  "paymentTypeId":  std.toString(paymentTypeFilteredArray[0].id)
+}

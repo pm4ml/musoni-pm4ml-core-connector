@@ -1,0 +1,22 @@
+
+local loanId = payload.loanId;
+local phoneNumber = payload.changes.accountNumber;
+local walletFsp = payload.changes.bankNumber;
+
+{
+"homeTransactionId": "53979be2-3bfe-45aa-ade7-92ea4ce4e74e",
+"from": {
+"idType": "ACCOUNT_ID",
+"idValue": loanId,
+},
+"to": {
+"type": "CONSUMER",
+"idType": "MSISDN",
+"idValue": phoneNumber,
+"fspId": walletFsp
+},
+"amountType": "RECEIVE",
+"currency": "MMK",
+"amount": "100000",
+"transactionType": "TRANSFER"
+}

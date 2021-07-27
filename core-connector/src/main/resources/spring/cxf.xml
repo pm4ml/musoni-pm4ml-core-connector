@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camelcxf="http://camel.apache.org/schema/cxf"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://cxf.apache.org/core
+        http://cxf.apache.org/schemas/core.xsd
+        http://camel.apache.org/schema/cxf
+        http://camel.apache.org/schema/cxf/camel-cxf-2.12.0-spring.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+
+    <cxf:bus id="cxf-bus">
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+
+<!--    <bean id="clientAdapterAPI" class="com.modusbox.client.router.ClientAdapterAPI" />-->
+<!--    <bean id="partiesRouter" class="com.modusbox.client.router.PartiesRouter" />-->
+<!--    <bean id="quotesRouter" class="com.modusbox.client.router.QuotesRouter" />-->
+<!--    <bean id="transfersRouter" class="com.modusbox.client.router.TransfersRouter" />-->
+<!--    <bean id="authRouter" class="com.modusbox.client.router.AuthRouter" />-->
+
+    <camel:camelContext>
+<!--        <camel:propertyPlaceholder id="properties" propertiesParserRef="jasypt"/>-->
+        <camel:package>com.modusbox.client.router</camel:package>
+<!--        <camel:routeBuilder ref="clientAdapterAPI"/>-->
+<!--        <camel:routeBuilder ref="authRouter"/>-->
+<!--        <camel:routeBuilder ref="partiesRouter"/>-->
+<!--        <camel:routeBuilder ref="quotesRouter"/>-->
+<!--        <camel:routeBuilder ref="transfersRouter"/>-->
+<!--        <camel:routeBuilder ref="sendMoneyRouter"/>-->
+    </camel:camelContext>
+
+<!--    <bean id="jasypt" class="org.apache.camel.component.jasypt.JasyptPropertiesParser">-->
+<!--        <property name="password" value="secret"/>-->
+<!--    </bean>-->
+    <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+    <bean id="customExceptionMapper" class="com.modusbox.client.exception.CustomExceptionMapper"/>
+    <bean id="customJsonMessage" class="com.modusbox.log4j2.message.CustomJsonMessageImpl" />
+
+    <camelcxf:rsServer
+            id="api-rs-server"
+            address="http://${server.api.listen.host}:${server.api.listen.port}/"
+    >
+        <camelcxf:serviceBeans>
+            <bean class="com.modusbox.client.jaxrs.PartiesApiImpl"/>
+            <bean class="com.modusbox.client.jaxrs.QuotesApiImpl"/>
+            <bean class="com.modusbox.client.jaxrs.TransfersApiImpl"/>
+            <bean class="com.modusbox.client.jaxrs.LoanDisbursementToMobileWalletApiImpl"/>
+            <bean class="com.modusbox.client.jaxrs.SendMoneyApiImpl"/>
+        </camelcxf:serviceBeans>
+        <camelcxf:providers>
+            <ref bean="jacksonJsonProvider"/>
+            <ref bean="customExceptionMapper"/>
+        </camelcxf:providers>
+    </camelcxf:rsServer>
+
+</beans>

@@ -1,0 +1,13 @@
+local curDate = header.curDate;
+local transferId = header.transferId;
+local sourceWallet = body.prepare.headers["fspiop-source"];
+
+{
+  "dateFormat": "dd-MM-yyyy",
+  "locale": "en",
+  "transactionDate": curDate  ,
+  "transactionAmount": body.prepare.body.amount.amount,
+  "note": "Source Wallet: "+sourceWallet+" "+transferId,
+  "receiptNumber": sourceWallet+" "+transferId,
+  "paymentTypeId": header.MMDWalletChannelId
+}

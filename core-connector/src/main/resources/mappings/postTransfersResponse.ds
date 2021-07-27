@@ -1,0 +1,8 @@
+local homeTransactionId =
+if exchangeProperty.loanTransactionId >0
+then exchangeProperty.loanTransactionId
+else payload.loanTransactionId;
+
+{
+  homeTransactionId: std.toString(homeTransactionId)
+}

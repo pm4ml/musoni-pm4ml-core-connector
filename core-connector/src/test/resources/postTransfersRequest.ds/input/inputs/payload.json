@@ -1,0 +1,28 @@
+{
+  "from": {
+    "displayName": "PayerFirst PayerLast",
+    "idType": "ALIAS",
+    "idValue": "{{payerfspALIAS}}"
+  },
+  "to": {
+    "idType": "ALIAS",
+    "idValue": "{{payeefspALIAS}}",
+    "extensionList": [
+      {
+        "key": "channelReferenceId",
+        "value": "modusbox123"
+      },
+      {
+        "key": "billerReferenceId",
+        "value": "84AC8F554FFD40588A588ACE7BAA82E8"
+      }
+    ]
+  },
+  "amountType": "SEND",
+  "currency": "{{currency}}",
+  "amount": "100.12",
+  "transactionType": "TRANSFER",
+  "initiatorType": "CONSUMER",
+  "note": "test payment",
+  "transferId": "{{$guid}}"
+}

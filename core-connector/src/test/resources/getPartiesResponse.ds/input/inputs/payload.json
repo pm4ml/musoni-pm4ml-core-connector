@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "status": "SUCCESS",
+  "result": {
+    "channelReferenceId": "modusbox123",
+    "billerReferenceId": "6C7287EFFB724D81AD0004084EED45B4",
+    "billDetails": {
+      "loanAccountNumber": "000277018",
+      "dueDetails": {
+        "dueAmount": 169500.00,
+        "dueDate": "2020-07-07"
+      }
+    },
+    "customerDetails": {
+      "name": "Daw Myint Hlaing",
+      "emailId": null,
+      "mobileNo": "9963752454",
+      "officeName": "Branch Office - Hlegu"
+    }
+  }
+}

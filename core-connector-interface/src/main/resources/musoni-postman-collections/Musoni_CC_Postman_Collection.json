@@ -1,0 +1,820 @@
+{
+	"info": {
+		"_postman_id": "1bf04af5-0a48-4a6c-b5e9-1e54e3606c3c",
+		"name": "MMD - Repayment Sample calls",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Lookup Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// --- Tests ---\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Skip next request if no success (200)\r",
+							"if(pm.response.code !== 200) {\r",
+							"    postman.setNextRequest(null)\r",
+							"}\r",
+							"\r",
+							"/** \r",
+							" * Work with the loan data\r",
+							" */\r",
+							"let moment = require(\"moment\");\r",
+							"let res = pm.response.json();\r",
+							"\r",
+							"\r",
+							"if ( res.length === 0) {\r",
+							"    console.log(\"No results found, stopping\")\r",
+							"    postman.setNextRequest(null);\r",
+							"}\r",
+							"else\r",
+							"{\r",
+							"    pm.variables.set(\"entityId\", res[0].entityId);\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"Account Lookup: \" + pm.variables.get(\"accountId\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "zarchitun",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "testuser",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Fineract-Platform-TenantId",
+						"type": "text",
+						"value": "thitsaworks"
+					},
+					{
+						"key": "X-api-key",
+						"value": "yE2wPAq90Laa23jbNLo3K43Kjmu7y1VZ3Pe36sQR",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.demo.sing.musoniservices.com/v1/search?query=000000010&resource=loans&exactMatch=true",
+					"protocol": "https",
+					"host": [
+						"api",
+						"demo",
+						"sing",
+						"musoniservices",
+						"com"
+					],
+					"path": [
+						"v1",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "000000010"
+						},
+						{
+							"key": "resource",
+							"value": "loans"
+						},
+						{
+							"key": "exactMatch",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lookup Loan Dues (Overdue)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// --- Tests ---\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Skip next request if no success (200)\r",
+							"if(pm.response.code !== 200) {\r",
+							"    postman.setNextRequest(null)\r",
+							"}\r",
+							"\r",
+							"/** \r",
+							" * Work with the loan data\r",
+							" */\r",
+							"let moment = require(\"moment\");\r",
+							"let res = pm.response.json();\r",
+							"\r",
+							"// Define necessary variables\r",
+							"let amountToPayLoanOverdue = 0;\r",
+							"let amountToPayLoanNext = 0;\r",
+							"let amountToPaySaving = 0;\r",
+							"let amountToPayLoan = 0;\r",
+							"let amountToPayTotal = 0;\r",
+							"let linkedSavingsAccount;\r",
+							"\r",
+							"// Set overdue amount (covers all past periods that are overdue in 1 go)\r",
+							"amountToPayLoanOverdue = res.summary.totalOverdue;\r",
+							"amountToPayLoan += amountToPayLoanOverdue;\r",
+							"\r",
+							"// pick first period in the future (next due)\r",
+							"let currentPeriod = res.repaymentSchedule.periods.filter(period => period.complete === false && moment().isAfter(period.fromDate) && moment().isBefore(period.dueDate)).first();\r",
+							"\r",
+							"if (currentPeriod) {\r",
+							"    amountToPayLoanNext = currentPeriod.totalOutstandingForPeriod;\r",
+							"}\r",
+							"\r",
+							"// Log calculated values\r",
+							"console.log(\"\\n============================================\");\r",
+							"console.log(\" Expected Loan Repayment -       Next: \" + amountToPayLoanNext);\r",
+							"console.log(\" Expected Loan Repayment -    Overdue: \" + amountToPayLoanOverdue);\r",
+							"console.log(\"--------------------------------------------\");\r",
+							"console.log(\" Expected Loan Repayment -      Total: \" + amountToPayLoan);\r",
+							"console.log(\"============================================\\n\");\r",
+							" \r",
+							"pm.variables.set(\"amountToPayLoan\", amountToPayLoan);\r",
+							"\r",
+							"if (pm.variables.get(\"amountToPayLoan\") == 0) {\r",
+							"    postman.setNextRequest(null);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"Loan ID: \" + pm.variables.get(\"entityId\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "zarchitun",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "testuser",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Fineract-Platform-TenantId",
+						"type": "text",
+						"value": "thitsaworks"
+					},
+					{
+						"key": "x-api-key",
+						"value": "yE2wPAq90Laa23jbNLo3K43Kjmu7y1VZ3Pe36sQR",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.demo.sing.musoniservices.com/v1/loans/000000074?associations=repaymentSchedule",
+					"protocol": "https",
+					"host": [
+						"api",
+						"demo",
+						"sing",
+						"musoniservices",
+						"com"
+					],
+					"path": [
+						"v1",
+						"loans",
+						"000000074"
+					],
+					"query": [
+						{
+							"key": "associations",
+							"value": "repaymentSchedule"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lookup Loan Dues (No Due)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// --- Tests ---\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Skip next request if no success (200)\r",
+							"if(pm.response.code !== 200) {\r",
+							"    postman.setNextRequest(null)\r",
+							"}\r",
+							"\r",
+							"/** \r",
+							" * Work with the loan data\r",
+							" */\r",
+							"let moment = require(\"moment\");\r",
+							"let res = pm.response.json();\r",
+							"\r",
+							"// Define necessary variables\r",
+							"let amountToPayLoanOverdue = 0;\r",
+							"let amountToPayLoanNext = 0;\r",
+							"let amountToPaySaving = 0;\r",
+							"let amountToPayLoan = 0;\r",
+							"let amountToPayTotal = 0;\r",
+							"let linkedSavingsAccount;\r",
+							"\r",
+							"// Set overdue amount (covers all past periods that are overdue in 1 go)\r",
+							"amountToPayLoanOverdue = res.summary.totalOverdue;\r",
+							"amountToPayLoan += amountToPayLoanOverdue;\r",
+							"\r",
+							"// pick first period in the future (next due)\r",
+							"let currentPeriod = res.repaymentSchedule.periods.filter(period => period.complete === false && moment().isAfter(period.fromDate) && moment().isBefore(period.dueDate)).first();\r",
+							"\r",
+							"if (currentPeriod) {\r",
+							"    amountToPayLoanNext = currentPeriod.totalOutstandingForPeriod;\r",
+							"}\r",
+							"\r",
+							"// Log calculated values\r",
+							"console.log(\"\\n============================================\");\r",
+							"console.log(\" Expected Loan Repayment -       Next: \" + amountToPayLoanNext);\r",
+							"console.log(\" Expected Loan Repayment -    Overdue: \" + amountToPayLoanOverdue);\r",
+							"console.log(\"--------------------------------------------\");\r",
+							"console.log(\" Expected Loan Repayment -      Total: \" + amountToPayLoan);\r",
+							"console.log(\"============================================\\n\");\r",
+							" \r",
+							"pm.variables.set(\"amountToPayLoan\", amountToPayLoan);\r",
+							"\r",
+							"if (pm.variables.get(\"amountToPayLoan\") == 0) {\r",
+							"    postman.setNextRequest(null);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"Loan ID: \" + pm.variables.get(\"entityId\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "TW@demo0112*",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "thitsaworks",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Fineract-Platform-TenantId",
+						"type": "text",
+						"value": "thitsaworks"
+					},
+					{
+						"key": "x-api-key",
+						"value": "yE2wPAq90Laa23jbNLo3K43Kjmu7y1VZ3Pe36sQR",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.demo.sing.musoniservices.com/v1/loans/000000075?associations=repaymentSchedule",
+					"protocol": "https",
+					"host": [
+						"api",
+						"demo",
+						"sing",
+						"musoniservices",
+						"com"
+					],
+					"path": [
+						"v1",
+						"loans",
+						"000000075"
+					],
+					"query": [
+						{
+							"key": "associations",
+							"value": "repaymentSchedule"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lookup Loan (Paid Off)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// --- Tests ---\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Skip next request if no success (200)\r",
+							"if(pm.response.code !== 200) {\r",
+							"    postman.setNextRequest(null)\r",
+							"}\r",
+							"\r",
+							"/** \r",
+							" * Work with the loan data\r",
+							" */\r",
+							"let moment = require(\"moment\");\r",
+							"let res = pm.response.json();\r",
+							"\r",
+							"// Define necessary variables\r",
+							"let amountToPayLoanOverdue = 0;\r",
+							"let amountToPayLoanNext = 0;\r",
+							"let amountToPaySaving = 0;\r",
+							"let amountToPayLoan = 0;\r",
+							"let amountToPayTotal = 0;\r",
+							"let linkedSavingsAccount;\r",
+							"\r",
+							"// Set overdue amount (covers all past periods that are overdue in 1 go)\r",
+							"amountToPayLoanOverdue = res.summary.totalOverdue;\r",
+							"amountToPayLoan += amountToPayLoanOverdue;\r",
+							"\r",
+							"// pick first period in the future (next due)\r",
+							"let currentPeriod = res.repaymentSchedule.periods.filter(period => period.complete === false && moment().isAfter(period.fromDate) && moment().isBefore(period.dueDate)).first();\r",
+							"\r",
+							"if (currentPeriod) {\r",
+							"    amountToPayLoanNext = currentPeriod.totalOutstandingForPeriod;\r",
+							"}\r",
+							"\r",
+							"// Log calculated values\r",
+							"console.log(\"\\n============================================\");\r",
+							"console.log(\" Expected Loan Repayment -       Next: \" + amountToPayLoanNext);\r",
+							"console.log(\" Expected Loan Repayment -    Overdue: \" + amountToPayLoanOverdue);\r",
+							"console.log(\"--------------------------------------------\");\r",
+							"console.log(\" Expected Loan Repayment -      Total: \" + amountToPayLoan);\r",
+							"console.log(\"============================================\\n\");\r",
+							" \r",
+							"pm.variables.set(\"amountToPayLoan\", amountToPayLoan);\r",
+							"\r",
+							"if (pm.variables.get(\"amountToPayLoan\") == 0) {\r",
+							"    postman.setNextRequest(null);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"Loan ID: \" + pm.variables.get(\"entityId\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "zarchitun",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "testuser",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Fineract-Platform-TenantId",
+						"type": "text",
+						"value": "thitsaworks"
+					},
+					{
+						"key": "x-api-key",
+						"value": "yE2wPAq90Laa23jbNLo3K43Kjmu7y1VZ3Pe36sQR",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.demo.sing.musoniservices.com/v1/loans/000000069?associations=repaymentSchedule",
+					"protocol": "https",
+					"host": [
+						"api",
+						"demo",
+						"sing",
+						"musoniservices",
+						"com"
+					],
+					"path": [
+						"v1",
+						"loans",
+						"000000069"
+					],
+					"query": [
+						{
+							"key": "associations",
+							"value": "repaymentSchedule"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Make Repayment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"if(pm.response.code !== 200) {\r",
+							"    postman.setNextRequest(null)\r",
+							"}\r",
+							"\r",
+							"var j = pm.response.json();\r",
+							"\r",
+							"if (j.commandId) {\r",
+							"    pm.variables.set(\"commandIdLoan\", j.commandId);\r",
+							"    postman.setNextRequest(\"Approve Repayment\");\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var moment = require('moment');\r",
+							"\r",
+							"pm.environment.set('today', moment().format((\"DD-MM-YYYY\")));\r",
+							"\r",
+							"console.log(\"--------------------------------------------\");\r",
+							"console.log(\"Repay \" + pm.variables.get(\"amountToPayLoan\") + \" on \" + pm.variables.get(\"today\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "zarchitun",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "testuser",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Fineract-Platform-TenantId",
+						"type": "text",
+						"value": "thitsaworks"
+					},
+					{
+						"key": "x-api-key",
+						"value": "yE2wPAq90Laa23jbNLo3K43Kjmu7y1VZ3Pe36sQR",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"dateFormat\": \"dd-MM-yyyy\",\r\n  \"locale\": \"en\",\r\n  \"transactionDate\": \"28-06-2021\",\r\n  \"transactionAmount\": \"50\",\r\n  \"note\": \"Postman check\",\r\n  \"paymentTypeId\": 218\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.demo.sing.musoniservices.com/v1/loans/000000001/transactions?command=repayment",
+					"protocol": "https",
+					"host": [
+						"api",
+						"demo",
+						"sing",
+						"musoniservices",
+						"com"
+					],
+					"path": [
+						"v1",
+						"loans",
+						"000000001",
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "command",
+							"value": "repayment"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Repayment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"if(pm.response.code !== 200) {\r",
+							"    postman.setNextRequest(null)\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Skip this request if there is no linked savings\r",
+							"if (pm.variables.get(\"commandIdLoan\") === undefined) {\r",
+							"    postman.setNextRequest(null);\r",
+							"}\r",
+							"\r",
+							"console.log(\"--------------------------------------------\");\r",
+							"console.log(\"Approve Repayment \" + pm.variables.get(\"commandIdLoan\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "zarchitun",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "testuser",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Fineract-Platform-TenantId",
+						"type": "text",
+						"value": "thitsaworks"
+					},
+					{
+						"key": "X-api-key",
+						"value": "yE2wPAq90Laa23jbNLo3K43Kjmu7y1VZ3Pe36sQR",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.demo.sing.musoniservices.com/v1/makercheckers/2520?command=approve",
+					"protocol": "https",
+					"host": [
+						"api",
+						"demo",
+						"sing",
+						"musoniservices",
+						"com"
+					],
+					"path": [
+						"v1",
+						"makercheckers",
+						"2520"
+					],
+					"query": [
+						{
+							"key": "command",
+							"value": "approve"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "user",
+			"value": "changeme"
+		},
+		{
+			"key": "password",
+			"value": "changeme"
+		},
+		{
+			"key": "tenant",
+			"value": "thitsaworks"
+		},
+		{
+			"key": "api",
+			"value": "https://api.demo.sing.musoniservices.com/v1"
+		},
+		{
+			"key": "apiKey",
+			"value": "changeme"
+		},
+		{
+			"key": "accountId",
+			"value": "000000064"
+		},
+		{
+			"key": "paymentTypeId",
+			"value": "218"
+		}
+	]
+}

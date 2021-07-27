@@ -1,0 +1,11 @@
+{
+  "code": 200,
+  "status": "SUCCESS",
+  "result": {
+    "channelReferenceId": "2ab1edba-ac7f-426c-a1c3-db0e4a8a511b",
+    "billerReferenceId": "502B23D78C6F48D79DEFB5E5E116DB18",
+    "billerPaymentTransactionId": 14470926,
+    "billerPaymentStatus": "SUCCESS",
+    "billerPaymentRemarks": "Payment marked as success."
+  }
+}
