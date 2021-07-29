@@ -16,17 +16,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <camel.version>3.1.0</camel.version>
-		<java.version>1.8</java.version>
+        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
-
-<!--        <dependency>-->
-<!--            <groupId>com.modus</groupId>-->
-<!--            <artifactId>core-connector-soap-mock</artifactId>-->
-<!--            <version>1.0.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.modusbox</groupId>
             <artifactId>core-connector-interface</artifactId>
@@ -83,12 +76,12 @@
             <scope>system</scope>
             <systemPath>${basedir}/lib/camel-datasonnet-1.0.4.jar</systemPath>
         </dependency>
-		
-		<dependency>
+
+        <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-cxf</artifactId>
-		  <version>${camel.version}</version>
-		</dependency>
+            <version>${camel.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
@@ -99,18 +92,18 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>3.3.6</version>
         </dependency>
-		
-		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-jackson</artifactId>
-			<version>${camel.version}</version>
-		</dependency>
+
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jackson</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
         </dependency>
 
-		<!-- Below needed to compile auto generated model classes. -->
+        <!-- Below needed to compile auto generated model classes. -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -121,7 +114,7 @@
             <artifactId>swagger-annotations</artifactId>
             <version>2.1.2</version>
         </dependency>
-        
+
         <!-- TESTING -->
         <dependency>
             <groupId>org.apache.camel</groupId>
@@ -190,11 +183,37 @@
             <version>20190722</version>
         </dependency>
 
+        <!-- Prometheus -->
+        <!-- The client -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+        <!-- Hotspot JVM metrics-->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_hotspot</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+        <!-- Exposition HTTPServer-->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_httpserver</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+        <!-- Pushgateway exposition-->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_pushgateway</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+        <!-- Prometheus -->
+
     </dependencies>
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -222,29 +241,6 @@
                     <modelPackage>com.modusbox.client.model</modelPackage>
                 </configuration>
             </plugin>
-            
-<!--			<plugin>-->
-<!--			  <groupId>org.apache.cxf</groupId>-->
-<!--			  <artifactId>cxf-codegen-plugin</artifactId>-->
-<!--			  <version>3.2.4</version>-->
-<!--			  <executions>-->
-<!--			    <execution>-->
-<!--			      <id>generate-sources</id>-->
-<!--			      <phase>generate-sources</phase>-->
-<!--			      <configuration>-->
-<!--			        <wsdlOptions>-->
-<!--			          <wsdlOption>-->
-<!--			            <wsdl>src/main/resources/wsdl/mockT24.wsdl</wsdl>-->
-<!--			          </wsdlOption>-->
-<!--			        </wsdlOptions>-->
-<!--			      </configuration>-->
-<!--			      <goals>-->
-<!--			        <goal>wsdl2java</goal>-->
-<!--			      </goals>-->
-<!--			    </execution>-->
-<!--			  </executions>-->
-<!--			</plugin>-->
-            
         </plugins>
     </build>
 

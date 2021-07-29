@@ -25,12 +25,6 @@ camel:
 #  host: https://localhost/api
 #  username: user
 #  password: pass
-#  name: DFSP CO. LTD.
-#  scope: scope
-#  client-id: id
-#  client-secret: secret
-#  grant-type: type
-#  is-password-encrypted: false
 #  tenant-id: id
 #  channel-id: 123
 #  api-key: key
