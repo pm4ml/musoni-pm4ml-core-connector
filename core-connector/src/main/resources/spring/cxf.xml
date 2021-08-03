@@ -15,7 +15,7 @@
 
     <cxf:bus id="cxf-bus">
         <cxf:features>
-            <cxf:logging/>
+<!--            <cxf:logging/>-->
         </cxf:features>
     </cxf:bus>
 
@@ -52,7 +52,8 @@
             <bean class="com.modusbox.client.jaxrs.QuotesApiImpl"/>
             <bean class="com.modusbox.client.jaxrs.TransfersApiImpl"/>
             <bean class="com.modusbox.client.jaxrs.LoanDisbursementToMobileWalletApiImpl"/>
-            <bean class="com.modusbox.client.jaxrs.SendMoneyApiImpl"/>
+            <bean class="com.modusbox.client.jaxrs.SendmoneyApiImpl"/>
+            <bean class="com.modusbox.client.jaxrs.HealthApiImpl"/>
         </camelcxf:serviceBeans>
         <camelcxf:providers>
             <ref bean="jacksonJsonProvider"/>

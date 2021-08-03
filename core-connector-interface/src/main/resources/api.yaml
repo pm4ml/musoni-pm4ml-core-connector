@@ -13,6 +13,21 @@ info:
 
 paths:
 
+  /health:
+    get:
+      description: >
+        The HTTP request `GET /health` is used to check if application is up and running.
+      operationId: getHealth
+      tags:
+        - Health
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+
   /loanDisbursementToWallet:
     post:
       summary: mifos loan disbursment
