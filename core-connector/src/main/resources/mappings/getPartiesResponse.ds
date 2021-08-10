@@ -1,15 +1,65 @@
-local loanId = cml.header('mfiCode') + cml.header('idValueTrimmed');
+local loanId=  cml.header('mfiCode')+ cml.exchangeProperty('entityId');
+
+local installments = payload.repaymentSchedule.periods;
+
+local overdueAmount = if(payload.summary.totalOverdue > 0 ) then payload.summary.totalOverdue else 0;
+
+local curDate = ds.datetime.format(ds.datetime.now(), "yyyy-MM-dd");
+
+local installmentsWoSummaryLine =if (ds.sizeOf(installments)>1)
+                    then ds.arrays.drop(installments,1) //strip first summary line
+                    else [];
+
+local unpaidInstallments = std.filter(function(i) i.complete == false, installmentsWoSummaryLine);
+
+local dueDateArr = if (unpaidInstallments != [])
+                    then unpaidInstallments[0].dueDate
+                    else [];
+
+local parseDueDateFromDateArr(dueArr)=
+                    if (ds.sizeOf(dueArr)==3) then
+                        std.toString(dueArr[0])+"-"+
+                        (if dueDateArr[1] <10 then "0"+std.toString(dueDateArr[1]) else std.toString (dueDateArr[1]))
+						+"-"+
+                     (if dueDateArr[2] <10 then "0"+std.toString(dueDateArr[2]) else std.toString (dueDateArr[2]))
+                    else "";
+
+local dueAmountInJson = if (unpaidInstallments != [])
+                    then if (unpaidInstallments[0].totalOutstandingForPeriod>0) then unpaidInstallments[0].totalOutstandingForPeriod else 0
+                    else 0;
+
+local dueDateInJson = parseDueDateFromDateArr(dueDateArr);
+
+local currentDueAmount = if (curDate == dueDateInJson) then dueAmountInJson else 0;
+
+local totalDue = overdueAmount+currentDueAmount;
+
+local dueDate = if (totalDue == 0) && (dueDateInJson > curDate) then
+    std.toString(dueDateInJson)
+    else  std.toString(curDate);
+
+local dueAmount = if (totalDue == 0) && (dueDateInJson > curDate) then
+     std.toString(dueAmountInJson)
+     else std.toString(totalDue);
 
 {
-    "idType": "ACCOUNT_ID",
-    "idValue": loanId,
-    "firstName": "",
-    "middleName": "",
-    "lastName": payload[0].parentName,
-    "extensionList": [
-        {
-		"key": "branchName",
-        "value": payload[0].officeName
-        }
-    ]
- }
+ "idType": "ACCOUNT_ID",
+ "idValue": loanId,
+ "firstName": "",
+ "middleName": "",
+ "lastName": cml.exchangeProperty('lastName'),
+ "extensionList": [
+     {
+     "key": "amountDue",
+     "value": dueAmount
+     },
+     {
+     "key": "dueDate",
+     "value": dueDate
+     },
+     {
+     "key": "branchName",
+     "value": cml.exchangeProperty('branchName')
+     }
+ ]
+}

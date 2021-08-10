@@ -1,0 +1,10 @@
+if payload != [] then
+{
+    "entityId": std.toString(payload[0].entityId),
+    "firstName": "",
+    "middleName": "",
+    "lastName": std.toString(payload[0].parentName),
+    "branchName":std.toString(payload[0].officeName)
+ }
+else
+    0

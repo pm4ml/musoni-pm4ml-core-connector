@@ -1,6 +1,8 @@
 package com.modusbox.client.router;
 
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
+import com.modusbox.client.processor.GenerateTimestamp;
+import com.modusbox.client.processor.SetPropertiesForGetParties;
 import com.modusbox.client.processor.TrimIdValueFromHeader;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
@@ -23,6 +25,8 @@ public class PartiesRouter extends RouteBuilder {
 
     private final TrimIdValueFromHeader trimIdValueFromHeader = new TrimIdValueFromHeader();
     private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
+    private final GenerateTimestamp generateTimestamp = new GenerateTimestamp();
+    private final SetPropertiesForGetParties setPropertiesForGetParties = new SetPropertiesForGetParties();
 
     public void configure() {
 
@@ -44,6 +48,7 @@ public class PartiesRouter extends RouteBuilder {
                         "null, null, 'fspiop-source: ${header.fspiop-source}')")
                 .setBody(simple("{}"))
                 .process(trimIdValueFromHeader)
+                .process(generateTimestamp)
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
                 .toD("{{dfsp.host}}/v1/search?query=${header.idValueTrimmed}&resource=loans&exactMatch=true")
@@ -52,10 +57,20 @@ public class PartiesRouter extends RouteBuilder {
                         "'Tracking the clientInfo response', 'Verify the response', null)")
 
                 .log("Musoni getLoanInfo response,${body}")
+
                 // Format the response
+                .process(setPropertiesForGetParties)
+                .log( "LastName: ${exchangeProperty.lastName}")
+                .log( "BranchName: ${exchangeProperty.branchName}")
+                .log( "EntityId: ${exchangeProperty.entityId}")
+
+                .to("direct:getAuthHeader")
+                .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+                .toD("{{dfsp.host}}/v1/loans/${exchangeProperty.entityId}?associations=repaymentSchedule")
                 .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
+
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Final getPartiesResponse: ${body}', " +
                         "null, null, 'Response of GET parties/${header.idType}/${header.idValue} API')")
