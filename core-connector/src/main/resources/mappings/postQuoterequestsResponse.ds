@@ -1,11 +1,11 @@
 {
-    "quoteId":  exchangeProperty.quoteId,
-    "transactionId":  exchangeProperty.transactionId,
-    "transferAmount": exchangeProperty.amount,
+    "quoteId":  cml.exchangeProperty('quoteId'),
+    "transactionId":  cml.exchangeProperty('transactionId'),
+    "transferAmount": cml.exchangeProperty('amount'),
     "transferAmountCurrency": "MMK",
     "payeeReceiveAmount": "0",
     "payeeReceiveAmountCurrency": "MMK",
     "payeeFspCommissionAmount": "0",
     "payeeFspCommissionAmountCurrency": "MMK",
-    "expiration": exchangeProperty.expiration
+    "expiration": cml.exchangeProperty('expiration')
 }

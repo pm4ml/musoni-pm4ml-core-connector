@@ -22,7 +22,7 @@ public class PartiesRouter extends RouteBuilder {
             .register();
 
     private final TrimIdValueFromHeader trimIdValueFromHeader = new TrimIdValueFromHeader();
-    private RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
+    private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
 
     public void configure() {
 
@@ -53,7 +53,9 @@ public class PartiesRouter extends RouteBuilder {
 
                 .log("Musoni getLoanInfo response,${body}")
                 // Format the response
-                .bean("getPartiesResponse")
+                .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Final getPartiesResponse: ${body}', " +
                         "null, null, 'Response of GET parties/${header.idType}/${header.idValue} API')")

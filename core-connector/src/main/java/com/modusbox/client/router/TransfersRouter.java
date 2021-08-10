@@ -33,8 +33,8 @@ public class TransfersRouter extends RouteBuilder {
             .help("Request latency in seconds for PUT /transfers.")
             .register();
 
-    private RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
-    private GenerateTimestamp generateTimestamp = new GenerateTimestamp();
+    private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
+    private final GenerateTimestamp generateTimestamp = new GenerateTimestamp();
     private final TrimIdValueFromToTransferRequestInbound trimMFICode = new TrimIdValueFromToTransferRequestInbound();
     private final SetPropertiesForMakerCheckerRepayment SetPropertiesForMakerCheckerRepayment = new SetPropertiesForMakerCheckerRepayment();
 
@@ -86,7 +86,9 @@ public class TransfersRouter extends RouteBuilder {
                 .process(generateTimestamp)
                 .setHeader("MMDWalletChannelId",constant("{{dfsp.channel-id}}"))
                 .log("MMDWalletChannelId: ${header.MMDWalletChannelId}")
-                .bean("postTransfersRequest")
+                .transform(datasonnet("resource:classpath:mappings/postTransfersRequest.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
                 .log("postTransfersRequest : ${body}")
 
                 // Get a valid Authorization header for oAuth
@@ -99,7 +101,9 @@ public class TransfersRouter extends RouteBuilder {
                         "'Tracking the loan repayment response', 'Verify the response', null)")
 
                 // Format the response
-                .bean("makeRepaymentResponse")
+                .transform(datasonnet("resource:classpath:mappings/makeRepaymentResponse.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
                 .process(SetPropertiesForMakerCheckerRepayment)
                 .log("commandId: ${exchangeProperty.commandId}")
                 .log("isMakerChecker: ${exchangeProperty.isMakerChecker}")
@@ -130,11 +134,15 @@ public class TransfersRouter extends RouteBuilder {
                         .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                                 "'Response from Musoni API, ApproveRepayment (MakerCheckerResponse): ${body}', " +
                                 "'Tracking the MakerChecker Response', 'Verify the response', null)")
-                        .bean("postTransfersResponse")
+                        .transform(datasonnet("resource:classpath:mappings/postTransfersResponse.ds"))
+                        .setBody(simple("${body.content}"))
+                        .marshal().json()
                         .log("Done postTransfersResponseWithMakerChecker")
                     .when(simple("${exchangeProperty.isMakerChecker} == 0 "))
                         .log("MakerChecker Off")
-                        .bean("postTransfersResponse")
+                        .transform(datasonnet("resource:classpath:mappings/postTransfersResponse.ds"))
+                        .setBody(simple("${body.content}"))
+                        .marshal().json()
                         .log("Done postTransfersResponseWithoutMakerChecker.")
                     .otherwise()
                         .log("Error in MakeRepayment......")

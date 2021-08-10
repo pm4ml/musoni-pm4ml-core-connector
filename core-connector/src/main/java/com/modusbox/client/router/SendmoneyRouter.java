@@ -51,7 +51,9 @@ public class SendmoneyRouter extends RouteBuilder {
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader("Content-Type", constant("application/json"))
                 // Prune empty items from the request
-                .process("postSendMoneyRequest")
+                .transform(datasonnet("resource:classpath:mappings/postSendMoneyRequest.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Calling outbound API, postTransfers, " +
                         "POST {{ml-conn.outbound.host}}', " +
@@ -81,7 +83,9 @@ public class SendmoneyRouter extends RouteBuilder {
                 .setHeader(Exchange.HTTP_METHOD, constant("PUT"))
                 .setHeader("Content-Type", constant("application/json"))
 //.process(exchange -> System.out.println())
-                .process("putTransfersAcceptPartyRequest")
+                .transform(datasonnet("resource:classpath:mappings/putTransfersAcceptPartyRequest.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Calling outbound API, putTransfersAcceptParty, " +
                         "PUT {{ml-conn.outbound.host}}/transfers/${exchangeProperty.postSendMoneyInitial?.get('transferId')}', " +
@@ -112,7 +116,9 @@ public class SendmoneyRouter extends RouteBuilder {
                 .setHeader(Exchange.HTTP_METHOD, constant("PUT"))
                 .setHeader("Content-Type", constant("application/json"))
                 // Will convert to JSON and only take the accept quote section
-                .process("putTransfersAcceptQuoteRequest")
+                .transform(datasonnet("resource:classpath:mappings/putTransfersAcceptQuoteRequest.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Calling outbound API, putTransfersById', " +
                         "'Tracking the request', 'Track the response', " +

@@ -1,7 +1,8 @@
 package com.modusbox.client.router;
 
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
-import com.modusbox.client.processor.*;
+import com.modusbox.client.processor.SetPropertiesForPostQuote;
+import com.modusbox.client.processor.TrimIdValueFromToQuoteRequest;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
@@ -22,7 +23,7 @@ public class QuotesRouter extends RouteBuilder {
 			.register();
 
 
-	private RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
+	private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
 	private final TrimIdValueFromToQuoteRequest trimMFICode = new TrimIdValueFromToQuoteRequest();
 	private final SetPropertiesForPostQuote setPropertiesPostQuote = new SetPropertiesForPostQuote();
 
@@ -54,7 +55,9 @@ public class QuotesRouter extends RouteBuilder {
 						"'Tracking the response', 'Verify the response', null)")
 
 				.log("Musoni response,${body}")
-				.bean("postQuoterequestsResponse")
+				.transform(datasonnet("resource:classpath:mappings/postQuoterequestsResponse.ds"))
+				.setBody(simple("${body.content}"))
+				.marshal().json()
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Final Response: ${body}', " +
 						"null, null, 'Response of POST /quoterequests API')")
