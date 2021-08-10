@@ -149,11 +149,11 @@
             <version>2.13.2</version>
         </dependency>
         <dependency>
-            <groupId>com.modus.adapter.exception</groupId>
-            <artifactId>cbs-adapters-exception-handling</artifactId>
+            <groupId>com.modus.pm4ml.core.connectors.common</groupId>
+            <artifactId>core-connectors-camel-common</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/cbs-adapters-exception-handling-1.0.0-SNAPSHOT.jar</systemPath>
+            <systemPath>${basedir}/lib/core-connectors-camel-common-1.0.0-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
