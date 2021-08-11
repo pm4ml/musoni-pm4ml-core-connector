@@ -24,8 +24,6 @@
 <!--    <bean id="quotesRouter" class="com.modusbox.client.router.QuotesRouter" />-->
 <!--    <bean id="transfersRouter" class="com.modusbox.client.router.TransfersRouter" />-->
 <!--    <bean id="authRouter" class="com.modusbox.client.router.AuthRouter" />-->
-    <bean id="customJsonMessage" class="com.modusbox.log4j2.message.CustomJsonMessageImpl" />
-    <bean id="customErrorRouter" class="com.modusbox.client.router.CustomErrorRouter" />
 
     <camel:camelContext>
 <!--        <camel:propertyPlaceholder id="properties" propertiesParserRef="jasypt"/>-->
@@ -43,6 +41,8 @@
 <!--    </bean>-->
     <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
     <bean id="globalExceptionMapper" class="com.modusbox.client.exception.GlobalExceptionMapper"/>
+    <bean id="customJsonMessage" class="com.modusbox.log4j2.message.CustomJsonMessageImpl" />
+    <bean id="customErrorRouter" class="com.modusbox.client.router.CustomErrorRouter" />
 
     <camelcxf:rsServer
             id="api-rs-server"
