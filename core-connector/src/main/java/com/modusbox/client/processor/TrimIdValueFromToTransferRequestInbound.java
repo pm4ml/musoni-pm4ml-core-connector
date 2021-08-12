@@ -15,9 +15,9 @@ public class TrimIdValueFromToTransferRequestInbound implements Processor {
         LinkedHashMap<String,Object> map  = (LinkedHashMap<String, Object>) fulfilNotification.getQuote().getInternalRequest();
         LinkedHashMap<String,String> to = (LinkedHashMap<String, String>) map.get("to");
         String idValueTrimmed = to.get("idValue");
-        String mfiCode = idValueTrimmed.substring(0, 3);
+        String mfiCode = StringUtils.trimMfiCode(idValueTrimmed,3);
         exchange.getIn().setHeader("mfiCode", mfiCode);
-        idValueTrimmed = idValueTrimmed.substring(3);
+        idValueTrimmed = StringUtils.trimIdValue(idValueTrimmed,3);
         exchange.getIn().setHeader("idValueTrimmed", idValueTrimmed);
 
     }

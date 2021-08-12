@@ -55,6 +55,7 @@ public class QuotesRouter extends RouteBuilder {
 						"'Tracking the response', 'Verify the response', null)")
 
 				.log("Musoni response,${body}")
+				.setProperty("origPayload", simple("${body}"))
 				.transform(datasonnet("resource:classpath:mappings/postQuoterequestsResponse.ds"))
 				.setBody(simple("${body.content}"))
 				.marshal().json()
