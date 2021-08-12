@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.modusbox</groupId>
         <artifactId>musoni-pm4ml-core-connector</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>core-connector</artifactId>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.datasonnet</groupId>
             <artifactId>datasonnet-mapper</artifactId>
-            <version>2.1.2</version>
+            <version>${datasonnet.version}</version>
         </dependency>
         <!-- Below needed to compile auto generated model classes. -->
         <dependency>
@@ -149,11 +149,11 @@
             <version>2.13.2</version>
         </dependency>
         <dependency>
-            <groupId>com.modus.adapter.exception</groupId>
-            <artifactId>cbs-adapters-exception-handling</artifactId>
+            <groupId>com.modus.pm4ml.core.connectors.common</groupId>
+            <artifactId>core-connectors-camel-common</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/cbs-adapters-exception-handling-1.0.0-SNAPSHOT.jar</systemPath>
+            <systemPath>${basedir}/lib/core-connectors-camel-common-1.0.0-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -166,25 +166,25 @@
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient</artifactId>
-            <version>0.10.0</version>
+            <version>${prometheus-client.version}</version>
         </dependency>
         <!-- Hotspot JVM metrics-->
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient_hotspot</artifactId>
-            <version>0.10.0</version>
+            <version>${prometheus-client.version}</version>
         </dependency>
         <!-- Exposition HTTPServer-->
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient_httpserver</artifactId>
-            <version>0.10.0</version>
+            <version>${prometheus-client.version}</version>
         </dependency>
         <!-- Pushgateway exposition-->
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient_pushgateway</artifactId>
-            <version>0.10.0</version>
+            <version>${prometheus-client.version}</version>
         </dependency>
         <!-- Prometheus -->
 
