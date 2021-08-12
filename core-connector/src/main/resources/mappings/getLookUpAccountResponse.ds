@@ -1,10 +1,15 @@
-if payload != [] then
-{
+if ds.sizeOf(payload)>0 then {
     "entityId": std.toString(payload[0].entityId),
-    "firstName": "",
-    "middleName": "",
     "lastName": std.toString(payload[0].parentName),
-    "branchName":std.toString(payload[0].officeName)
+    "branchName":std.toString(payload[0].officeName),
+	"entityStatusID" :  std.toString(payload[0].entityStatus.id),
+	"entityStatusValue" :  std.toString(payload[0].entityStatus.value),
  }
-else
-    0
+ else
+ {
+    "entityId": "",
+    "lastName": "",
+    "branchName":"",
+	"entityStatusID" :  "",
+	"entityStatusValue" : ""
+ }

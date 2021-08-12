@@ -9,7 +9,7 @@ public final class CustomErrorRouter extends RouteBuilder {
     public void configure() {
 
         from("direct:extractCustomErrors")
-            .process(customErrorProcessor)
+                .process(customErrorProcessor)
         ;
     }
 }

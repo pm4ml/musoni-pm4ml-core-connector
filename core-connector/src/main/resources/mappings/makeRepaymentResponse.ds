@@ -18,7 +18,7 @@ else if (loanTransactionId >0  && commandId == 0 ) then 0
 else 2;
 
 {
-  "commandId" : commandId,
-  "loanTransactionId": loanTransactionId,
-  "isMakerChecker" : isMakerChecker
+  "commandId" : std.toString(commandId),
+  "loanTransactionId":  loanTransactionId,
+  "isMakerChecker" :  isMakerChecker
 }

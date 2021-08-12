@@ -1,6 +1,6 @@
-local curDate = header.curDate;
-local transferId = header.transferId;
-local sourceWallet = body.prepare.headers["fspiop-source"];
+local curDate = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"), "dd-MM-yyyy");
+local transferId = cml.header('transferId');
+local sourceWallet = if body.prepare.headers["fspiop-source"] != null then body.prepare.headers["fspiop-source"] else "";
 
 {
   "dateFormat": "dd-MM-yyyy",
@@ -9,5 +9,5 @@ local sourceWallet = body.prepare.headers["fspiop-source"];
   "transactionAmount": body.prepare.body.amount.amount,
   "note": "Source Wallet: "+sourceWallet+" "+transferId,
   "receiptNumber": sourceWallet+" "+transferId,
-  "paymentTypeId": header.MMDWalletChannelId
+  "paymentTypeId": cml.header('MMDWalletChannelId')
 }

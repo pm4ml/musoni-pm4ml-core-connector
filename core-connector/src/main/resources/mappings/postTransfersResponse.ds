@@ -1,7 +1,6 @@
-local homeTransactionId =
-if exchangeProperty.loanTransactionId >0
-then exchangeProperty.loanTransactionId
-else payload.loanTransactionId;
+local loanTransactionId = cml.exchangeProperty('loanTransactionId');
+local payloadTransactionId = if std.objectHas(payload, "loanTransactionId") then payload.loanTransactionId else 0;
+local homeTransactionId = if loanTransactionId >0 then loanTransactionId else payloadTransactionId;
 
 {
   homeTransactionId: std.toString(homeTransactionId)

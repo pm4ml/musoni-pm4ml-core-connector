@@ -1,9 +1,7 @@
 package com.modusbox.client.router;
 
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
-import com.modusbox.client.processor.GenerateTimestamp;
-import com.modusbox.client.processor.SetPropertiesForGetParties;
-import com.modusbox.client.processor.TrimIdValueFromHeader;
+import com.modusbox.client.processor.*;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
@@ -25,7 +23,6 @@ public class PartiesRouter extends RouteBuilder {
 
     private final TrimIdValueFromHeader trimIdValueFromHeader = new TrimIdValueFromHeader();
     private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
-    private final GenerateTimestamp generateTimestamp = new GenerateTimestamp();
     private final SetPropertiesForGetParties setPropertiesForGetParties = new SetPropertiesForGetParties();
 
     public void configure() {
@@ -48,17 +45,22 @@ public class PartiesRouter extends RouteBuilder {
                         "null, null, 'fspiop-source: ${header.fspiop-source}')")
                 .setBody(simple("{}"))
                 .process(trimIdValueFromHeader)
-                .process(generateTimestamp)
+                .setHeader("MFIName",constant("{{dfsp.name}}"))
+
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
                 .toD("{{dfsp.host}}/v1/search?query=${header.idValueTrimmed}&resource=loans&exactMatch=true")
+                .unmarshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Response from Musoni Loan API, ${body}', " +
                         "'Tracking the clientInfo response', 'Verify the response', null)")
 
                 .log("Musoni getLoanInfo response,${body}")
-
-                // Format the response
+                .marshal().json()
+                .transform(datasonnet("resource:classpath:mappings/getLookUpAccountResponse.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
+                //Format the response
                 .process(setPropertiesForGetParties)
                 .log( "LastName: ${exchangeProperty.lastName}")
                 .log( "BranchName: ${exchangeProperty.branchName}")
@@ -67,6 +69,8 @@ public class PartiesRouter extends RouteBuilder {
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
                 .toD("{{dfsp.host}}/v1/loans/${exchangeProperty.entityId}?associations=repaymentSchedule")
+                .unmarshal().json()
+                .marshal().json()
                 .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
@@ -78,8 +82,8 @@ public class PartiesRouter extends RouteBuilder {
                  * END processing
                  */
                 .doFinally().process(exchange -> {
-                    ((Histogram.Timer) exchange.getProperty(TIMER_NAME)).observeDuration(); // stop Prometheus Histogram metric
-                }).end()
+            ((Histogram.Timer) exchange.getProperty(TIMER_NAME)).observeDuration(); // stop Prometheus Histogram metric
+        }).end()
         ;
 
     }

@@ -34,7 +34,6 @@ public class TransfersRouter extends RouteBuilder {
             .register();
 
     private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
-    private final GenerateTimestamp generateTimestamp = new GenerateTimestamp();
     private final TrimIdValueFromToTransferRequestInbound trimMFICode = new TrimIdValueFromToTransferRequestInbound();
     private final SetPropertiesForMakerCheckerRepayment SetPropertiesForMakerCheckerRepayment = new SetPropertiesForMakerCheckerRepayment();
 
@@ -80,12 +79,13 @@ public class TransfersRouter extends RouteBuilder {
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Request received, PUT /transfers/{transferId}', " +
                         "null, null, 'Input Payload: ${body}')")
+                .log("Header transferID,${header.transferId}")
                 .process(trimMFICode)
                 // Prepare Request Body for Make Repayment Call
-                // Generate timeStamp which we need in mapping
-                .process(generateTimestamp)
                 .setHeader("MMDWalletChannelId",constant("{{dfsp.channel-id}}"))
                 .log("MMDWalletChannelId: ${header.MMDWalletChannelId}")
+
+                .marshal().json()
                 .transform(datasonnet("resource:classpath:mappings/postTransfersRequest.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
@@ -96,14 +96,17 @@ public class TransfersRouter extends RouteBuilder {
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .toD("{{dfsp.host}}/v1/loans/${header.idValueTrimmed}/transactions?command=repayment")
+                .unmarshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Response from Musoni API, MakeLoanRepaymentResponse: ${body}', " +
                         "'Tracking the loan repayment response', 'Verify the response', null)")
 
                 // Format the response
+                .marshal().json()
                 .transform(datasonnet("resource:classpath:mappings/makeRepaymentResponse.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
+
                 .process(SetPropertiesForMakerCheckerRepayment)
                 .log("commandId: ${exchangeProperty.commandId}")
                 .log("isMakerChecker: ${exchangeProperty.isMakerChecker}")
@@ -111,11 +114,11 @@ public class TransfersRouter extends RouteBuilder {
                 .log("makeRepaymentResponse,${body}")
                 .to("direct:choiceRoute")
 
-                /*
-                 * END processing
-                 */
-                .removeHeaders("*", "X-*")
-                .setBody(constant(null))
+        /*
+         * END processing
+         */
+//                .removeHeaders("*", "X-*")
+//                .setBody(constant(null))
                 .doFinally().process(exchange -> {
                     ((Histogram.Timer) exchange.getProperty(TIMER_NAME_PUT)).observeDuration(); // stop Prometheus Histogram metric
                 }).end()
@@ -131,13 +134,17 @@ public class TransfersRouter extends RouteBuilder {
                         .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                         .toD("{{dfsp.host}}/v1/makercheckers/${exchangeProperty.commandId}?command=approve")
                         .log("After MakerChecker APi")
+                        .unmarshal().json()
+
                         .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                                 "'Response from Musoni API, ApproveRepayment (MakerCheckerResponse): ${body}', " +
                                 "'Tracking the MakerChecker Response', 'Verify the response', null)")
+                        .marshal().json()
                         .transform(datasonnet("resource:classpath:mappings/postTransfersResponse.ds"))
                         .setBody(simple("${body.content}"))
                         .marshal().json()
                         .log("Done postTransfersResponseWithMakerChecker")
+
                     .when(simple("${exchangeProperty.isMakerChecker} == 0 "))
                         .log("MakerChecker Off")
                         .transform(datasonnet("resource:classpath:mappings/postTransfersResponse.ds"))
