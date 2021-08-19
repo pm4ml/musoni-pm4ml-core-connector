@@ -1,11 +1,13 @@
 package com.modusbox.client.router;
 
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
-import com.modusbox.client.processor.*;
+import com.modusbox.client.processor.SetPropertiesForMakerCheckerRepayment;
+import com.modusbox.client.processor.TrimIdValueFromToTransferRequestInbound;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.http.base.HttpOperationFailedException;
 
 
 public class TransfersRouter extends RouteBuilder {
@@ -59,6 +61,8 @@ public class TransfersRouter extends RouteBuilder {
                 /*
                  * END processing
                  */
+
+
                 .doFinally().process(exchange -> {
                     ((Histogram.Timer) exchange.getProperty(TIMER_NAME_POST)).observeDuration(); // stop Prometheus Histogram metric
                 }).end()
@@ -114,6 +118,9 @@ public class TransfersRouter extends RouteBuilder {
                 .log("makeRepaymentResponse,${body}")
                 .to("direct:choiceRoute")
 
+                .doCatch(HttpOperationFailedException.class)
+                    .log("HttpOperationFailedException Caught")
+                    .to("direct:extractCustomErrors")
         /*
          * END processing
          */
@@ -133,6 +140,7 @@ public class TransfersRouter extends RouteBuilder {
                         .log("set auth header..... ")
                         .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                         .toD("{{dfsp.host}}/v1/makercheckers/${exchangeProperty.commandId}?command=approve")
+                        // .toD("{{dfsp.host}}/v1/makercheckers/3402?command=approve")
                         .log("After MakerChecker APi")
                         .unmarshal().json()
 
