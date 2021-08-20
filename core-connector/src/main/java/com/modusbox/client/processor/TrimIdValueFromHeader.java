@@ -21,7 +21,7 @@ public class TrimIdValueFromHeader implements Processor {
         // Check REQUIRED_FIELD_MISSING ERROR
         if (mfiCode.equals("") || idValueTrimmed.equals("")) {
             ErrorCode ec = ErrorCode.REQUIRED_FIELD_MISSING;
-            ErrorUtils.throwHttpException(ec);
+            ErrorUtils.throwCustomException(ec);
         }
         else {
             // Check idVlaue is with only Digits
@@ -30,7 +30,7 @@ public class TrimIdValueFromHeader implements Processor {
             if (isDigits == false)
             {
                 ErrorCode ec = ErrorCode.MALFORMED_INPUT;
-                ErrorUtils.throwHttpException(ec);
+                ErrorUtils.throwCustomException(ec);
             }
         }
     }

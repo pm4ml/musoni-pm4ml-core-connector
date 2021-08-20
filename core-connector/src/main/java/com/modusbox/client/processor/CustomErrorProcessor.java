@@ -47,7 +47,7 @@ public class CustomErrorProcessor implements Processor {
                             errorDescription = respObject.getString("returnStatus");
                         } else if (respObject.has("errors")) {
                             JSONArray arayObject = respObject.getJSONArray("errors");
-                            JSONObject errorObject = (JSONObject)arayObject.get(0);
+                            JSONObject errorObject = (JSONObject) arayObject.get(0);
                             if (errorObject.has("errorCode")) {
                                 statusCode = String.valueOf(errorObject.getInt("errorCode"));
                                 errorDescription = errorObject.getString("errorSource");

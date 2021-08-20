@@ -1,5 +1,6 @@
 package com.modusbox.client.processor;
 
+import com.modusbox.client.common.Constants;
 import com.modusbox.client.common.ErrorUtils;
 import com.modusbox.client.enums.ErrorCode;
 import org.apache.camel.Exchange;
@@ -13,9 +14,6 @@ public class SetPropertiesForGetParties implements Processor {
     public void process(Exchange exchange) throws Exception {
 
         String body = exchange.getIn().getBody(String.class);
-        int code = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE,Integer.class);
-
-        System.out.println("**** HtppCode"+code);
         JSONObject respObject = new JSONObject(body);
 
         String lastName = respObject.getString("lastName");
@@ -31,11 +29,12 @@ public class SetPropertiesForGetParties implements Processor {
             exchange.setProperty("entityId", entityId);
             exchange.setProperty("entityStatusID", entityStatusID);
             exchange.setProperty("entityStatusValue", entityStatusValue);
+            exchange.setProperty("rejectCodes", Constants.REJECT_CODES);
         }
         else
         {
             ErrorCode ec = ErrorCode.ACCOUNT_NOT_EXIST;
-            ErrorUtils.throwHttpException(ec);
+            ErrorUtils.throwCustomException(ec);
         }
 
     }

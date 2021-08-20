@@ -20,10 +20,10 @@ public class SetPropertiesForMakerCheckerRepayment implements Processor {
 
         if (commandId == null || commandId == "" || loanTransactionId == null) {
             ErrorCode ec = ErrorCode.REQUIRED_FIELD_MISSING;
-            ErrorUtils.throwHttpException(ec);
+            ErrorUtils.throwCustomException(ec);
         } else if (isMakerChecker.equals(2)) {
             ErrorCode ec = ErrorCode.CC_LOGICAL_TRANSFORMATION_ERROR;
-            ErrorUtils.throwHttpException(ec);
+            ErrorUtils.throwCustomException(ec);
         } else {
             exchange.setProperty("loanTransactionId", loanTransactionId);
             exchange.setProperty("commandId", commandId);
