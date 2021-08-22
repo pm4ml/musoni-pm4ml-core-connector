@@ -20,7 +20,7 @@ public class TrimIdValueFromHeader implements Processor {
 
         // Check REQUIRED_FIELD_MISSING ERROR
         if (mfiCode.equals("") || idValueTrimmed.equals("")) {
-            ErrorCode ec = ErrorCode.REQUIRED_FIELD_MISSING;
+            ErrorCode ec = ErrorCode.ACCOUNT_NOT_EXIST;
             ErrorUtils.throwCustomException(ec);
         }
         else {
