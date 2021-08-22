@@ -8,9 +8,8 @@ public class SetPropertiesForPostQuote implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        System.out.println("**** From Processor***"+exchange.getIn().getBody());
-
-        QuoteRequest quoteRequest = exchange.getIn().getBody(QuoteRequest.class);
+        
+		QuoteRequest quoteRequest = exchange.getIn().getBody(QuoteRequest.class);
         String quoteId=  quoteRequest.getQuoteId();
         String transactionId= quoteRequest.getTransactionId();
         String amount = quoteRequest.getAmount();
