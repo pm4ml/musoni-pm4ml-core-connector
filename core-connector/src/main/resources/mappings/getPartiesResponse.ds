@@ -1,7 +1,9 @@
 local entityStatusID = cml.exchangeProperty('entityStatusID');
 local entityStatusValue = cml.exchangeProperty('entityStatusValue');
 local entityID = cml.exchangeProperty('entityId');
-local message = if entityStatusID == "600" || entityStatusID == "601" then entityStatusValue else "";
+local rejectCodes = cml.exchangeProperty('rejectCodes');
+local isFound = ds.arrays.firstWith(rejectCodes, function(item) item == entityStatusID);
+local message = if isFound!=null then entityStatusValue else "";
 
 if entityID != "" && entityStatusID != "" then
 
@@ -57,59 +59,62 @@ if entityID != "" && entityStatusID != "" then
                         else 0;
 
         local dueAmountString = if dueAmount >= 0 then std.toString(dueAmount) else "";
-        local amountMessage =  if dueAmount < 0 then " Negative DueAmount" else "";
         {
-         "idType": "ACCOUNT_ID",
-         "idValue": loanId,
-         "firstName": "",
-         "middleName": "",
-         "lastName": cml.exchangeProperty('lastName'),
-         "extensionList": [
-             {
-             "key": "mfiName",
-             "value": cml.header("MFIName")
-             },
-             {
-             "key": "amountDue",
-             "value": dueAmountString
-             },
-             {
-             "key": "dueDate",
-             "value": dueDate
-             },
-             {
-             "key": "branchName",
-             "value": cml.exchangeProperty('branchName')
-             },
-             {"message": message+amountMessage
-             }
-         ]
+           "idType": "ACCOUNT_ID",
+           "idValue": loanId,
+           "firstName": "",
+           "middleName": "",
+           "lastName": cml.exchangeProperty("lastName"),
+           "extensionList": [
+              {
+                 "key":"mfiName",
+                 "value":cml.header("MFIName")
+              },
+              {
+                 "key":"amountDue",
+                 "value":dueAmountString
+              },
+              {
+                 "key":"dueDate",
+                 "value":dueDate
+              },
+              {
+                 "key":"branchName",
+                 "value":cml.exchangeProperty("branchName")
+              },
+              {
+                 "key":"message",
+                 "value":message
+              }
+           ]
         }
 else
-            {
-             "idType": "ACCOUNT_ID",
-             "idValue": "",
-             "firstName": "",
-             "middleName": "",
-             "lastName": "",
-             "extensionList": [
+        {
+              "idType":"ACCOUNT_ID",
+              "idValue":"",
+              "firstName":"",
+              "middleName":"",
+              "lastName":"",
+              "extensionList":[
                  {
-                 "key": "mfiName",
-                 "value": ""
+                    "key":"mfiName",
+                    "value":""
                  },
                  {
-                 "key": "amountDue",
-                 "value": ""
+                    "key":"amountDue",
+                    "value":""
                  },
                  {
-                 "key": "dueDate",
-                 "value": ""
+                    "key":"dueDate",
+                    "value":""
                  },
                  {
-                 "key": "branchName",
-                 "value": ""
+                    "key":"branchName",
+                    "value":""
                  },
-                 {"message": "EntityID: "+entityID+" , EntityStatusID: "+entityStatusID
+                 {
+                    "key":"message",
+                    "value":"EntityID: "+entityID+", EntityStatusID: "+entityStatusID
                  }
-                ]
-             }
+              ]
+           }

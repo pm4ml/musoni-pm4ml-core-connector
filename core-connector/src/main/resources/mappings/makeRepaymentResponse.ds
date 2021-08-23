@@ -1,19 +1,19 @@
 local loanTransactionId =
-if std.objectHas(payload, "loanTransactionId")
+if ds.sizeOf(payload)>0 && std.objectHas(payload, "loanTransactionId")
 && payload.loanTransactionId >0
 && !std.objectHas(payload, "commandId")
 then payload.loanTransactionId
 else  0;
 
 local commandId =
-if std.objectHas(payload, "commandId")
+if ds.sizeOf(payload)>0 && std.objectHas(payload, "commandId")
 && payload.commandId >0
 && !std.objectHas(payload, "loanTransactionId")
 then payload.commandId
 else  0;
 
 local isMakerChecker =
-if(loanTransactionId == 0 && commandId>0   ) then 1
+if(loanTransactionId == 0 && commandId>0) then 1
 else if (loanTransactionId >0  && commandId == 0 ) then 0
 else 2;
 

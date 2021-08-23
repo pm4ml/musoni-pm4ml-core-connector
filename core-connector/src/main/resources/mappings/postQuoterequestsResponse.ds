@@ -3,8 +3,8 @@
     "transactionId":  cml.exchangeProperty('transactionId'),
     "transferAmount": cml.exchangeProperty('amount'),
     "transferAmountCurrency": "MMK",
-    "payeeReceiveAmount": "0",
-    "payeeReceiveAmountCurrency": "MMK",
+	"payeeFspFeeAmount": "0",
+	"payeeFspFeeAmountCurrency": "MMK",
     "payeeFspCommissionAmount": "0",
     "payeeFspCommissionAmountCurrency": "MMK",
     "expiration": cml.exchangeProperty('expiration')

@@ -1,4 +1,7 @@
-package com.modusbox.client.processor;
+package com.modusbox.client.common;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class StringUtils  {
 
@@ -20,5 +23,11 @@ public final class StringUtils  {
         }
         return idValue;
     }
-
+    public static boolean isOnlyDigits (String str)
+    {
+        String regex = "[0-9]+";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(str);
+        return m.matches();
+    }
 }
