@@ -1,11 +1,11 @@
 local entityStatusID = cml.exchangeProperty('entityStatusID');
 local entityStatusValue = cml.exchangeProperty('entityStatusValue');
-local entityID = cml.exchangeProperty('entityId');
+local idValue = cml.header('idValueTrimmed');
 local rejectCodes = cml.exchangeProperty('rejectCodes');
 local isFound = ds.arrays.firstWith(rejectCodes, function(item) item == entityStatusID);
 local message = if isFound!=null then entityStatusValue else "";
 
-local loanId=  cml.header('mfiCode')+ entityID;
+local loanId=  cml.header('mfiCode')+ idValue;
 
 local installments = payload.repaymentSchedule.periods;
 
