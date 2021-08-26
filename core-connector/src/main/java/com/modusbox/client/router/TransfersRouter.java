@@ -136,7 +136,7 @@ public class TransfersRouter extends RouteBuilder {
                     .when(simple("${exchangeProperty.isMakerChecker} == 1"))
                         .log("MakerChecker On")
                         .setBody(simple("{}"))
-						.removeHeaders("*")
+			.removeHeaders("*")
                         .to("direct:getAuthHeader")
                         .log("set auth header..... ")
                         .setHeader(Exchange.HTTP_METHOD, constant("POST"))
