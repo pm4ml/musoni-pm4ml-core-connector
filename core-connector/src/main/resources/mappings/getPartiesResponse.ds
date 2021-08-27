@@ -62,6 +62,7 @@ if message !="" then
 {
            "idType": "ACCOUNT_ID",
            "idValue": loanId,
+		   "lastName" : cml.exchangeProperty("lastName"),
            "displayName": cml.exchangeProperty("lastName"),
            "extensionList": [
               {
@@ -86,6 +87,7 @@ else
 {
    "idType": "ACCOUNT_ID",
    "idValue": loanId,
+   "lastName" : cml.exchangeProperty("lastName"),
    "displayName": cml.exchangeProperty("lastName"),
    "extensionList": [
 	  {
