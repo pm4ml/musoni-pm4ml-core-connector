@@ -10,6 +10,6 @@ local amount = if (payloadSize>0) && (body.prepare.body.amount.amount!= null) th
   "transactionDate": curDate  ,
   "transactionAmount": amount,
   "note": "Source Wallet: "+sourceWallet+" "+transferId,
-  "receiptNumber": sourceWallet+" "+transferId,
+  "receiptNumber": ds.strings.withMaxSize(sourceWallet, 12)+" "+transferId,
   "paymentTypeId": cml.header('MMDWalletChannelId')
 }

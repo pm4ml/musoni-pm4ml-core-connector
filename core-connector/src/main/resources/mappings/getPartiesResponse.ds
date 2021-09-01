@@ -78,7 +78,7 @@ if message !="" then
                  "value":cml.exchangeProperty("branchName")
               },
               {
-                 "key":"message",
+                 "key":"errorMessage",
                  "value":message
               }
            ]
