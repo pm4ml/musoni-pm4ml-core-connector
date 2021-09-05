@@ -1,6 +1,7 @@
 package com.modusbox.client.router;
 
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
+import com.modusbox.client.processor.SetPropertiesForClientId;
 import com.modusbox.client.processor.SetPropertiesForGetParties;
 import com.modusbox.client.processor.TrimIdValueFromHeader;
 import io.prometheus.client.Counter;
@@ -26,6 +27,7 @@ public class PartiesRouter extends RouteBuilder {
     private final TrimIdValueFromHeader trimIdValueFromHeader = new TrimIdValueFromHeader();
     private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
     private final SetPropertiesForGetParties setPropertiesForGetParties = new SetPropertiesForGetParties();
+    private final SetPropertiesForClientId setPropertiesForClientId = new SetPropertiesForClientId();
 
     public void configure() {
 
@@ -43,55 +45,73 @@ public class PartiesRouter extends RouteBuilder {
                  */
                 .log("Account lookup API called")
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Request received, GET /parties/${header.idType}/${header.idValue}/${header.subIdValue}', " +
+                        "'Request received, GET /parties/${header.idType}/${header.idValue}', " +
                         "null, null, 'fspiop-source: ${header.fspiop-source}')")
                 .setBody(simple("{}"))
                 .process(trimIdValueFromHeader)
                 .setHeader("MFIName", constant("{{dfsp.name}}"))
 
+                //Search ClientID By PhNo
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-                .toD("{{dfsp.host}}/v1/search?query=${header.idValueTrimmed}&resource=loans&exactMatch=true")
+                .toD("{{dfsp.host}}/v1/search?query=${header.idsubValue}&tenantIdentifier=demo&pretty=true&resource=clients")
                 .unmarshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Response from Musoni Loan API, ${body}', " +
                         "'Tracking the clientInfo response', 'Verify the response', null)")
 
-                .log("Musoni getLoanInfo response,${body}")
+                .log("Musoni SearchClientIDByPhNo response,${body}")
+                .marshal().json()
+                .transform(datasonnet("resource:classpath:mappings/getLookUpAccountwithPhnoResponse.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
+
+                //Format the response
+                .process(setPropertiesForClientId)
+                .log("EntityId: ${exchangeProperty.entityId}")
+
+                //Get Accounts
+                .to("direct:getAuthHeader")
+                .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+                .toD("{{dfsp.host}}/v1/search?query=${exchangeProperty.entityId}&tenantIdentifier=demo&pretty=true&resource=clients")
+                .unmarshal().json()
+                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                        "'Response from Musoni Loan API, ${body}', " +
+                        "'Tracking the clientInfo response', 'Verify the response', null)")
+
+                .log("Musoni GetAccountLists response,${body}")
+                .log("EntityId: ${exchangeProperty.entityId}")
                 .marshal().json()
                 .transform(datasonnet("resource:classpath:mappings/getLookUpAccountResponse.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
-                //Format the response
-                .process(setPropertiesForGetParties)
-
-                .log("LastName: ${exchangeProperty.lastName}")
-                .log("BranchName: ${exchangeProperty.branchName}")
-                .log("EntityId: ${exchangeProperty.entityId}")
-
-                .to("direct:getAuthHeader")  .toD("{{dfsp.host}}/v1/loans/${exchangeProperty.entityId}?associations=repaymentSchedule")
-                .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-
-                .unmarshal().json()
-                .marshal().json()
-                .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
-                .setBody(simple("${body.content}"))
-                .marshal().json()
-
+//
+//                .log("LastName: ${exchangeProperty.lastName}")
+//                .log("BranchName: ${exchangeProperty.branchName}")
+//                .log("EntityId: ${exchangeProperty.entityId}")
+//
+//                .to("direct:getAuthHeader")
+//                .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+//                .toD("{{dfsp.host}}/v1/loans/${exchangeProperty.entityId}?associations=repaymentSchedule")
+//                .unmarshal().json()
+//                .marshal().json()
+//                .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
+//                .setBody(simple("${body.content}"))
+//                .marshal().json()
+//
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Final getPartiesResponse: ${body}', " +
-                        "null, null, 'Response of GET parties/${header.idType}/${header.idValue}/${header.subIdValue} API')")
+                        "null, null, 'Response of GET parties/${header.idType}/${header.idValue} API')")
                 /*
                  * END processing
                  */
                 .doCatch(HttpOperationFailedException.class)
-                    .log("HttpOperationFailedException Caught")
-                    .to("direct:extractCustomErrors")
+                .log("HttpOperationFailedException Caught")
+                .to("direct:extractCustomErrors")
 
                 .doFinally().process(exchange -> {
             ((Histogram.Timer) exchange.getProperty(TIMER_NAME)).observeDuration(); // stop Prometheus Histogram metric
         }).end()
         ;
-
     }
 }

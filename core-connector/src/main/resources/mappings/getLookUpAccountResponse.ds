@@ -1,6 +1,6 @@
 if ds.sizeOf(payload)>0 then {
     "entityId": std.toString(payload[0].entityId),
-    "lastName": std.toString(payload[0].parentName),
+    "lastName": std.toString(payload[0].entityName),
     "branchName":std.toString(payload[0].officeName),
 	"entityStatusID" :  std.toString(payload[0].entityStatus.id),
 	"entityStatusValue" :  std.toString(payload[0].entityStatus.value),
