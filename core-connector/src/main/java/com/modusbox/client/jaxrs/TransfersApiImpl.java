@@ -12,8 +12,8 @@ public class TransfersApiImpl implements TransfersApi{
     }
 
     @Override
-    public void putTransfers(String transferId, FulfilNotification fulfilNotification) {
-
+    public TransferResponseInbound putTransfersByTransferId(String transferId, FulfilNotification fulfilNotification) {
+        return null;
     }
 
 }

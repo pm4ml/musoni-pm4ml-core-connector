@@ -31,7 +31,7 @@ public class QuotesRouter extends RouteBuilder {
 		// Add our global exception handling strategy
 		exceptionHandlingConfigurer.configureExceptionHandling(this);
 
-		from("direct:postQuoterequests").routeId("com.modusbox.postQuoterequests").doTry()
+		from("direct:postQuoteRequests").routeId("com.modusbox.postQuoteRequests").doTry()
 				.process(exchange -> {
 					reqCounter.inc(1); // increment Prometheus Counter metric
 					exchange.setProperty(TIMER_NAME, reqLatency.startTimer()); // initiate Prometheus Histogram metric
@@ -39,12 +39,16 @@ public class QuotesRouter extends RouteBuilder {
 				/*
 				 * BEGIN processing
 				 */
+				.process(exchange -> System.out.println("Strating Post Quote*****"))
 				.log("POST Quotes API called")
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Request received, POST /quoterequests', " +
 						"null, null, 'Input Payload: ${body}')")
 				.process(trimMFICode)
+				.process(exchange -> System.out.println("After Trimming*****"))
+
 				.process(setPropertiesPostQuote)
+				.process(exchange -> System.out.println("After setPropertiesPostQuote*****"))
 
 				.to("direct:getAuthHeader")
 				.setHeader(Exchange.HTTP_METHOD, constant("GET"))
@@ -55,6 +59,7 @@ public class QuotesRouter extends RouteBuilder {
 						"'Tracking the response', 'Verify the response', null)")
 
 				.log("Musoni response,${body}")
+				.process(exchange -> System.out.println("After calling CBS:*****"))
 				.setProperty("origPayload", simple("${body}"))
 				.transform(datasonnet("resource:classpath:mappings/postQuoterequestsResponse.ds"))
 				.setBody(simple("${body.content}"))

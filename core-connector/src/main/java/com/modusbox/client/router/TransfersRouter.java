@@ -70,7 +70,7 @@ public class TransfersRouter extends RouteBuilder {
 
 
         // POST /transfers to send the bill payment
-        from("direct:putTransfers").routeId("com.modusbox.transfersTransferIdPut").doTry()
+        from("direct:putTransfersByTransferId").routeId("com.modusbox.putTransfersByTransferId").doTry()
                 .process(exchange -> {
                     reqCounterPut.inc(1); // increment Prometheus Counter metric
                     exchange.setProperty(TIMER_NAME_PUT, reqLatencyPut.startTimer()); // initiate Prometheus Histogram metric

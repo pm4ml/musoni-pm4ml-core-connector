@@ -17,6 +17,7 @@ java \
 -Ddfsp.tenant-id="id" \
 -Ddfsp.channel-id="channelId" \
 -Ddfsp.api-key="apiKey" \
+-Ddfsp.name="mfiName" \
 -jar ./core-connector/target/core-connector.jar
 ```
 ```

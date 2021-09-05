@@ -33,7 +33,7 @@ public class PartiesRouter extends RouteBuilder {
         exceptionHandlingConfigurer.configureExceptionHandling(this);
 
         // In this case the GET parties will return the loan account with customer details
-        from("direct:getParties").routeId("com.modusbox.getParties").doTry()
+        from("direct:getPartiesByIdTypeIdValueSubIdValue").routeId("com.modusbox.getPartiesByIdTypeIdValueSubIdValue").doTry()
                 .process(exchange -> {
                     reqCounter.inc(1); // increment Prometheus Counter metric
                     exchange.setProperty(TIMER_NAME, reqLatency.startTimer()); // initiate Prometheus Histogram metric
@@ -43,7 +43,7 @@ public class PartiesRouter extends RouteBuilder {
                  */
                 .log("Account lookup API called")
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Request received, GET /parties/${header.idType}/${header.idValue}', " +
+                        "'Request received, GET /parties/${header.idType}/${header.idValue}/${header.subIdValue}', " +
                         "null, null, 'fspiop-source: ${header.fspiop-source}')")
                 .setBody(simple("{}"))
                 .process(trimIdValueFromHeader)
@@ -69,9 +69,9 @@ public class PartiesRouter extends RouteBuilder {
                 .log("BranchName: ${exchangeProperty.branchName}")
                 .log("EntityId: ${exchangeProperty.entityId}")
 
-                .to("direct:getAuthHeader")
+                .to("direct:getAuthHeader")  .toD("{{dfsp.host}}/v1/loans/${exchangeProperty.entityId}?associations=repaymentSchedule")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-                .toD("{{dfsp.host}}/v1/loans/${exchangeProperty.entityId}?associations=repaymentSchedule")
+
                 .unmarshal().json()
                 .marshal().json()
                 .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
@@ -80,7 +80,7 @@ public class PartiesRouter extends RouteBuilder {
 
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Final getPartiesResponse: ${body}', " +
-                        "null, null, 'Response of GET parties/${header.idType}/${header.idValue} API')")
+                        "null, null, 'Response of GET parties/${header.idType}/${header.idValue}/${header.subIdValue} API')")
                 /*
                  * END processing
                  */
