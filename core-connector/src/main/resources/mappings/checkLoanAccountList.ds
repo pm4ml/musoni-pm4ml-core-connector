@@ -1,0 +1,23 @@
+local idValueWithoutZeros = cml.exchangeProperty('idValueWithoutZeros');
+local loanAccountAry = ds.filterObject(payload, function(value, key, index) key == "loanAccounts");
+
+local isFoundLoans = if ds.sizeOf(payload) > 0 && ds.sizeOf(loanAccountAry)>0 then true else false;
+local searchedLoanAry = if isFoundLoans == true then std.filter(function(i) std.toString(i.id) == idValueWithoutZeros, loanAccountAry.loanAccounts);
+local isMatchedLoanWithPhNo = if isFoundLoans == true && ds.sizeOf(searchedLoanAry)>0 then true else false ;
+
+if isFoundLoans == true && isMatchedLoanWithPhNo == true then
+{
+    "entityId" : std.toString(searchedLoanAry[0].id),
+    "entityStatusID": std.toString(searchedLoanAry[0].status.id),
+    "entityStatusValue":searchedLoanAry[0].status.value,
+    "isFoundLoans" : isFoundLoans,
+    "isMatchedLoanWithPhNo" : isMatchedLoanWithPhNo
+}
+else
+{
+    "entityId" : "",
+    "entityStatusID": "",
+    "entityStatusValue": "",
+    "isFoundLoans" : isFoundLoans,
+    "isMatchedLoanWithPhNo" : isMatchedLoanWithPhNo
+}

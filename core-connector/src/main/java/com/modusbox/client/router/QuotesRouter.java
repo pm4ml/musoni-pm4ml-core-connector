@@ -45,10 +45,8 @@ public class QuotesRouter extends RouteBuilder {
 						"'Request received, POST /quoterequests', " +
 						"null, null, 'Input Payload: ${body}')")
 				.process(trimMFICode)
-				.process(exchange -> System.out.println("After Trimming*****"))
 
 				.process(setPropertiesPostQuote)
-				.process(exchange -> System.out.println("After setPropertiesPostQuote*****"))
 
 				.to("direct:getAuthHeader")
 				.setHeader(Exchange.HTTP_METHOD, constant("GET"))
@@ -59,7 +57,6 @@ public class QuotesRouter extends RouteBuilder {
 						"'Tracking the response', 'Verify the response', null)")
 
 				.log("Musoni response,${body}")
-				.process(exchange -> System.out.println("After calling CBS:*****"))
 				.setProperty("origPayload", simple("${body}"))
 				.transform(datasonnet("resource:classpath:mappings/postQuoterequestsResponse.ds"))
 				.setBody(simple("${body.content}"))

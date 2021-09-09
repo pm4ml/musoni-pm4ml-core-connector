@@ -1,14 +1,16 @@
 package com.modusbox.client.router;
 
+import com.modusbox.client.customexception.CCCustomException;
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
-import com.modusbox.client.processor.SetPropertiesForClientId;
-import com.modusbox.client.processor.SetPropertiesForGetParties;
+import com.modusbox.client.processor.SetPropertiesForClientInfo;
+import com.modusbox.client.processor.SetPropertiesForLoanInfo;
+import com.modusbox.client.processor.ValidatePhoneNumber;
 import com.modusbox.client.processor.TrimIdValueFromHeader;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.http.base.HttpOperationFailedException;
+import org.json.JSONException;
 
 public class PartiesRouter extends RouteBuilder {
 
@@ -26,8 +28,9 @@ public class PartiesRouter extends RouteBuilder {
 
     private final TrimIdValueFromHeader trimIdValueFromHeader = new TrimIdValueFromHeader();
     private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
-    private final SetPropertiesForGetParties setPropertiesForGetParties = new SetPropertiesForGetParties();
-    private final SetPropertiesForClientId setPropertiesForClientId = new SetPropertiesForClientId();
+    private final SetPropertiesForLoanInfo setPropertiesForLoanInfo = new SetPropertiesForLoanInfo();
+    private final SetPropertiesForClientInfo setPropertiesForClientInfo = new SetPropertiesForClientInfo();
+    private final ValidatePhoneNumber validatePhoneNumber = new ValidatePhoneNumber();
 
     public void configure() {
 
@@ -35,7 +38,7 @@ public class PartiesRouter extends RouteBuilder {
         exceptionHandlingConfigurer.configureExceptionHandling(this);
 
         // In this case the GET parties will return the loan account with customer details
-        from("direct:getPartiesByIdTypeIdValueSubIdValue").routeId("com.modusbox.getPartiesByIdTypeIdValueSubIdValue").doTry()
+        from("direct:getPartiesByIdTypeIdValueIdSubValue").routeId("com.modusbox.getPartiesByIdTypeIdValueIdSubValue").doTry()
                 .process(exchange -> {
                     reqCounter.inc(1); // increment Prometheus Counter metric
                     exchange.setProperty(TIMER_NAME, reqLatency.startTimer()); // initiate Prometheus Histogram metric
@@ -45,58 +48,55 @@ public class PartiesRouter extends RouteBuilder {
                  */
                 .log("Account lookup API called")
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Request received, GET /parties/${header.idType}/${header.idValue}/${header.subIdValue}', " +
+                        "'Request received, GET /parties/${header.idType}/${header.idValue}/${header.idSubValue}', " +
                         "null, null, 'fspiop-source: ${header.fspiop-source}')")
                 .setBody(simple("{}"))
                 .process(trimIdValueFromHeader)
                 .setHeader("MFIName", constant("{{dfsp.name}}"))
+                // .process(setPropertyForPhoneNo)
+                // .log("PhNo after stripping: ${exchangeProperty.strippedPhNo}")
 
                 //Search ClientID By PhNo
                 .to("direct:searchClientIdByPhNo")
+                //Format the response.Check Client found or not.
+                .process(setPropertiesForClientInfo)
 
-                //Format the response
-                .process(setPropertiesForClientId) // Found or not ?
-                .log("EntityId After lookup with PhNo: ${exchangeProperty.entityId}")
-
-                //Get Accounts
+                //Get LoanList with clientId
                 .to("direct:getAccountListByClientId")
 
-                //Format the response
-                .process(setPropertiesForGetParties)// Found or not ? Match or not with Idvaluetrim?
+                //Format the response.Check Loan Accounts found or not.And match with Phno or not.
+                .process(setPropertiesForLoanInfo)
+
+                .log("EntityId after lookup with with PhNo: ${exchangeProperty.entityId}")
+                .log("Idvalue without Zeros Leading: ${exchangeProperty.idValueWithoutZeros}")
                 .log("LastName: ${exchangeProperty.lastName}")
                 .log("BranchName: ${exchangeProperty.branchName}")
-                .log("EntityId After lookup with ClientId: ${exchangeProperty.entityId}")
+                .log("rejectCodes: ${exchangeProperty.rejectCodes}")
+                .log("entityStatusID: ${exchangeProperty.entityStatusID}")
+                .log("entityStatusValue: ${exchangeProperty.entityStatusValue}")
 
-                //GET Loans by idValue
-                //Choice Route
-                .log("Headers GET Loans by idValue** ${headers}")
-                .to("direct:getAuthHeader")
-                .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-                .toD("{{dfsp.host}}/v1/loans/${header.idValueTrimmed}?associations=repaymentSchedule")
-                .unmarshal().json()
-                .marshal().json()
-                .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
-                .setBody(simple("${body.content}"))
-                .marshal().json()
-
+                //Get Loan By IdValue
+                .to("direct:getLoanByIdValue")
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Final getPartiesResponse: ${body}', " +
-                        "null, null, 'Response of GET parties/${header.idType}/${header.idValue}/${header.subIdValue} API')")
-               /*
+                        "null, null, 'Response of GET parties/${header.idType}/${header.idValue}/${header.idSubValue} API')")
+                /*
                  * END processing
                  */
-                .doCatch(HttpOperationFailedException.class)
-                    .log("HttpOperationFailedException Caught")
-                    .to("direct:extractCustomErrors")
+
+                .doCatch(CCCustomException.class, JSONException.class)
+                .log("HttpOperationFailedException Caught")
+                .to("direct:extractCustomErrors")
 
                 .doFinally().process(exchange -> {
             ((Histogram.Timer) exchange.getProperty(TIMER_NAME)).observeDuration(); // stop Prometheus Histogram metric
         }).end()
         ;
+
         from("direct:searchClientIdByPhNo")
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-                .toD("{{dfsp.host}}/v1/search?query=${header.subIdValue}&tenantIdentifier=demo&pretty=true&resource=clients")
+                .toD("{{dfsp.host}}/v1/search?query=${header.idSubValue}&tenantIdentifier=demo&pretty=true&resource=clients")
                 .unmarshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Response from Musoni Loan API with idsubValue , ${body}', " +
@@ -104,7 +104,7 @@ public class PartiesRouter extends RouteBuilder {
 
                 .log("Musoni SearchClientIDByPhNo response,${body}")
                 .marshal().json()
-                .transform(datasonnet("resource:classpath:mappings/getLookUpAccountwithPhnoResponse.ds"))
+                .transform(datasonnet("resource:classpath:mappings/getLoanInfoWithPhNoResponse.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
         ;
@@ -112,7 +112,7 @@ public class PartiesRouter extends RouteBuilder {
         from("direct:getAccountListByClientId")
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-                .toD("{{dfsp.host}}/v1/search?query=${exchangeProperty.entityId}&tenantIdentifier=demo&pretty=true&resource=clients")
+                .toD("{{dfsp.host}}/v1/clients/${exchangeProperty.clientId}/accounts")
                 .unmarshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Response from Musoni Loan API with AccountId, ${body}', " +
@@ -120,7 +120,18 @@ public class PartiesRouter extends RouteBuilder {
 
                 .log("Musoni GetAccountLists response,${body}")
                 .marshal().json()
-                .transform(datasonnet("resource:classpath:mappings/getLookUpAccountResponse.ds"))
+                .transform(datasonnet("resource:classpath:mappings/checkLoanAccountList.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
+        ;
+
+        from("direct:getLoanByIdValue")
+                .to("direct:getAuthHeader")
+                .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+                .toD("{{dfsp.host}}/v1/loans/${header.idValueTrimmed}?associations=repaymentSchedule")
+                .unmarshal().json()
+                .marshal().json()
+                .transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
         ;

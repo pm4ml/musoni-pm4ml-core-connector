@@ -30,4 +30,17 @@ public final class StringUtils  {
         Matcher m = p.matcher(str);
         return m.matches();
     }
+    public static String removeLeadingZeros(String str)
+    {
+        // Regex to remove leading
+        String regex = "^0+(?!$)";
+
+        // Replaces the matched
+        // value with given string
+        str = str.replaceAll(regex, "");
+        return str;
+    }
+    public static String parseJsonString(String str){
+        return str.replaceAll("\"", "\'");
+    }
 }

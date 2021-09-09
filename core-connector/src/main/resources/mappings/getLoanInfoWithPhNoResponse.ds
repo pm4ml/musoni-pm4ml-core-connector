@@ -1,0 +1,12 @@
+if ds.sizeOf(payload)>0 then {
+    "clientId": std.toString(payload[0].entityId),
+    "lastName": std.toString(payload[0].entityName),
+    "branchName" : std.toString(payload[0].officeName)
+}
+else
+{
+    "clientId": "",
+    "lastName": "",
+    "branchName" : ""
+}
+

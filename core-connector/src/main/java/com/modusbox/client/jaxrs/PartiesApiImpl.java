@@ -13,7 +13,7 @@ public class PartiesApiImpl implements PartiesApi {
     }
 
     @Override
-    public TransferPartyInbound getPartiesByIdTypeIdValueSubIdValue(String idType, String idValue, String subIdValue) {
+    public TransferPartyInbound getPartiesByIdTypeIdValueIdSubValue(String idType, String idValue, String idSubValue) {
         return null;
     }
 }

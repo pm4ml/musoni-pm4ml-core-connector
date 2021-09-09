@@ -1,7 +1,0 @@
-if ds.sizeOf(payload)>0 then {
-    "entityId": std.toString(payload[0].entityId)
- }
- else
- {
-    "entityId": ""
- }

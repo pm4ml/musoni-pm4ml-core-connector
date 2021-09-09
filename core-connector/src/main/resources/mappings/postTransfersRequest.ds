@@ -1,5 +1,5 @@
 local curDate = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"), "dd-MM-yyyy");
-local transferId = cml.header('transferId');
+local transferId = ds.strings.substringBefore(cml.header('transferId'), "-");
 local payloadSize = ds.sizeOf(payload);
 local sourceWallet = if (payloadSize>0) && (body.prepare.headers["fspiop-source"] != null) then body.prepare.headers["fspiop-source"] else "";
 local amount = if (payloadSize>0) && (body.prepare.body.amount.amount!= null) then body.prepare.body.amount.amount else "0";
@@ -7,9 +7,9 @@ local amount = if (payloadSize>0) && (body.prepare.body.amount.amount!= null) th
 {
   "dateFormat": "dd-MM-yyyy",
   "locale": "en",
-  "transactionDate": curDate  ,
+  "transactionDate": curDate,
   "transactionAmount": amount,
   "note": "Source Wallet: "+sourceWallet+" "+transferId,
-  "receiptNumber": ds.strings.withMaxSize(sourceWallet, 12)+" "+transferId,
+  "receiptNumber": ds.strings.withMaxSize(sourceWallet, 38)+" "+transferId,
   "paymentTypeId": cml.header('MMDWalletChannelId')
 }
