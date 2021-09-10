@@ -31,7 +31,7 @@ public class QuotesRouter extends RouteBuilder {
 		// Add our global exception handling strategy
 		exceptionHandlingConfigurer.configureExceptionHandling(this);
 
-		from("direct:postQuoterequests").routeId("com.modusbox.postQuoterequests").doTry()
+		from("direct:postQuoteRequests").routeId("com.modusbox.postQuoteRequests").doTry()
 				.process(exchange -> {
 					reqCounter.inc(1); // increment Prometheus Counter metric
 					exchange.setProperty(TIMER_NAME, reqLatency.startTimer()); // initiate Prometheus Histogram metric
@@ -39,11 +39,13 @@ public class QuotesRouter extends RouteBuilder {
 				/*
 				 * BEGIN processing
 				 */
+				.process(exchange -> System.out.println("Strating Post Quote*****"))
 				.log("POST Quotes API called")
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Request received, POST /quoterequests', " +
 						"null, null, 'Input Payload: ${body}')")
 				.process(trimMFICode)
+
 				.process(setPropertiesPostQuote)
 
 				.to("direct:getAuthHeader")

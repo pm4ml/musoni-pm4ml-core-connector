@@ -1,5 +1,6 @@
 package com.modusbox.client.router;
 
+import com.modusbox.client.customexception.CCCustomException;
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
 import com.modusbox.client.processor.SetPropertiesForMakerCheckerRepayment;
 import com.modusbox.client.processor.TrimIdValueFromToTransferRequestInbound;
@@ -8,6 +9,7 @@ import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.http.base.HttpOperationFailedException;
+import org.json.JSONException;
 
 
 public class TransfersRouter extends RouteBuilder {
@@ -70,7 +72,7 @@ public class TransfersRouter extends RouteBuilder {
 
 
         // POST /transfers to send the bill payment
-        from("direct:putTransfers").routeId("com.modusbox.transfersTransferIdPut").doTry()
+        from("direct:putTransfersByTransferId").routeId("com.modusbox.putTransfersByTransferId").doTry()
                 .process(exchange -> {
                     reqCounterPut.inc(1); // increment Prometheus Counter metric
                     exchange.setProperty(TIMER_NAME_PUT, reqLatencyPut.startTimer()); // initiate Prometheus Histogram metric
@@ -118,14 +120,12 @@ public class TransfersRouter extends RouteBuilder {
                 .log("makeRepaymentResponse,${body}")
                 .to("direct:choiceRoute")
 
-                .doCatch(HttpOperationFailedException.class)
+                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class)
                     .log("HttpOperationFailedException Caught")
                     .to("direct:extractCustomErrors")
         /*
          * END processing
          */
-//                .removeHeaders("*", "X-*")
-//                .setBody(constant(null))
                 .doFinally().process(exchange -> {
                     ((Histogram.Timer) exchange.getProperty(TIMER_NAME_PUT)).observeDuration(); // stop Prometheus Histogram metric
                 }).end()
