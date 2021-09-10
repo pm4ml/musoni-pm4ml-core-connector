@@ -76,9 +76,9 @@ public class CustomErrorProcessor implements Processor {
                     if (exception instanceof CCCustomException) {
                         errorResponse = new JSONObject(exception.getMessage());
                     } else if (exception instanceof InternalServerErrorException) {
-                        errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, exception.getMessage()));
+                        errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
                     } else if (exception instanceof ConnectTimeoutException || exception instanceof SocketTimeoutException) {
-                        errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.SERVER_TIMED_OUT, exception.getMessage()));
+                        errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.SERVER_TIMED_OUT));
                     } else if (exception instanceof JSONException) {
                         errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, StringUtils.parseJsonString(exception.getMessage())));
                     }
