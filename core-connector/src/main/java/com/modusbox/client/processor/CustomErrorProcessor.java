@@ -30,6 +30,7 @@ public class CustomErrorProcessor implements Processor {
         int httpResponseCode = 500;
 
         JSONObject errorResponse = null;
+        boolean errorFlag = false;
 
         String errorDescription = "Downstream API failed.";
         // The exception may be in 1 of 2 places
@@ -51,23 +52,23 @@ public class CustomErrorProcessor implements Processor {
                             statusCode = String.valueOf(respObject.getInt("returnCode"));
                             errorDescription = respObject.getString("returnStatus");
                         } else if (e.getStatusCode() == 401 || e.getStatusCode() == 403) {
-                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.DESTINATION_COMMUNICATION_ERROR, exception.getMessage()));
-                            httpResponseCode = errorResponse.getInt("errorCode");
-                            errorResponse = errorResponse.getJSONObject("errorInformation");
-                            statusCode = String.valueOf(errorResponse.getInt("statusCode"));
-                            errorDescription = respObject.getString("message");
+                            errorFlag = true;
+                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.DESTINATION_COMMUNICATION_ERROR,StringUtils.parseJsonString(respObject.getString("message"))));
                         } else if (respObject.has("errors")) {
+                            errorFlag = true;
                             JSONArray arayObject = respObject.getJSONArray("errors");
                             JSONObject errorObject = (JSONObject) arayObject.get(0);
-
-                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, exception.getMessage()));
-                            httpResponseCode = errorResponse.getInt("errorCode");
-                            errorResponse = errorResponse.getJSONObject("errorInformation");
-                            statusCode = String.valueOf(errorResponse.getInt("statusCode"));
                             errorDescription = errorObject.getString("defaultUserMessage");
+                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, StringUtils.parseJsonString(errorDescription)));
                         }
                     }
                 } finally {
+                    if (errorFlag) {
+                        httpResponseCode = errorResponse.getInt("errorCode");
+                        errorResponse = errorResponse.getJSONObject("errorInformation");
+                        statusCode = String.valueOf(errorResponse.getInt("statusCode"));
+                        errorDescription = errorResponse.getString("description");
+                    }
                     reasonText = "{ \"statusCode\": \"" + statusCode + "\"," +
                             "\"message\": \"" + errorDescription + "\"} ";
                 }
