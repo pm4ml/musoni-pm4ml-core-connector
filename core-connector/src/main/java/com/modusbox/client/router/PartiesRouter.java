@@ -4,12 +4,13 @@ import com.modusbox.client.customexception.CCCustomException;
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
 import com.modusbox.client.processor.SetPropertiesForClientInfo;
 import com.modusbox.client.processor.SetPropertiesForLoanInfo;
-import com.modusbox.client.processor.ValidatePhoneNumber;
+import com.modusbox.client.validator.ValidatePhoneNumber;
 import com.modusbox.client.processor.TrimIdValueFromHeader;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.http.base.HttpOperationFailedException;
 import org.json.JSONException;
 
 public class PartiesRouter extends RouteBuilder {
@@ -53,10 +54,9 @@ public class PartiesRouter extends RouteBuilder {
                 .setBody(simple("{}"))
                 .process(trimIdValueFromHeader)
                 .setHeader("MFIName", constant("{{dfsp.name}}"))
-                // .process(setPropertyForPhoneNo)
-                // .log("PhNo after stripping: ${exchangeProperty.strippedPhNo}")
+                .process(validatePhoneNumber)
 
-                //Search ClientID By PhNo
+                //Search clientId By PhNo
                 .to("direct:searchClientIdByPhNo")
                 //Format the response.Check Client found or not.
                 .process(setPropertiesForClientInfo)
@@ -84,9 +84,9 @@ public class PartiesRouter extends RouteBuilder {
                  * END processing
                  */
 
-                .doCatch(CCCustomException.class, JSONException.class)
-                .log("HttpOperationFailedException Caught")
-                .to("direct:extractCustomErrors")
+                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class)
+                    .log("Exception Caught")
+                    .to("direct:extractCustomErrors")
 
                 .doFinally().process(exchange -> {
             ((Histogram.Timer) exchange.getProperty(TIMER_NAME)).observeDuration(); // stop Prometheus Histogram metric

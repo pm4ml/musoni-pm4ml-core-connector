@@ -120,7 +120,7 @@ public class TransfersRouter extends RouteBuilder {
                 .log("makeRepaymentResponse,${body}")
                 .to("direct:choiceRoute")
 
-                .doCatch(CCCustomException.class, JSONException.class)
+                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class)
                     .log("HttpOperationFailedException Caught")
                     .to("direct:extractCustomErrors")
         /*
