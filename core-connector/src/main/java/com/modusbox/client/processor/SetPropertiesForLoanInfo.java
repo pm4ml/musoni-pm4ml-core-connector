@@ -26,7 +26,7 @@ public class SetPropertiesForLoanInfo implements Processor {
             exchange.setProperty("entityId", entityId);
             exchange.setProperty("entityStatusID", entityStatusID);
             exchange.setProperty("entityStatusValue", entityStatusValue);
-            exchange.setProperty("rejectCodes", Constants.REJECT_CODES);
+            exchange.setProperty("loanStatusWhitelist", Constants.LOAN_STATUS_WHITELIST);
         } else if (!isFoundLoans) {
             throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.GENERIC_ID_NOT_FOUND, "Account does not exist."));
         } else {

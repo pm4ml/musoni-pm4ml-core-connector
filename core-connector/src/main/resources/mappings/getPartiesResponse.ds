@@ -1,110 +1,112 @@
 local entityStatusID = cml.exchangeProperty('entityStatusID');
 local entityStatusValue = cml.exchangeProperty('entityStatusValue');
-local idValue = cml.header('idValueTrimmed');
-local rejectCodes = cml.exchangeProperty('rejectCodes');
-local isFound = ds.arrays.firstWith(rejectCodes, function(item) item == entityStatusID);
-local message = if isFound!=null then entityStatusValue else "";
+local idValueTrimmed = cml.header('idValueTrimmed');
+local idSubValue = cml.header('idSubValue');
+local loanStatusWhitelist = cml.exchangeProperty('loanStatusWhitelist');
+local isActive = ds.arrays.firstWith(loanStatusWhitelist, function(item) item == entityStatusID);
+local errorMessage = if isActive == null then entityStatusValue else "";
 
-local loanId=  cml.header('mfiCode')+ idValue;
+local idValue=  cml.header('mfiCode')+ idValueTrimmed;
 
-local installments = payload.repaymentSchedule.periods;
+if errorMessage == "" then
+    local installments = payload.repaymentSchedule.periods;
 
-local curDate = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"), "yyyy-MM-dd");
+    local curDate = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"), "yyyy-MM-dd");
 
-local year =  ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"),"yyyy");
+    local year =  ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"),"yyyy");
 
-local month = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"),"M");
+    local month = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"),"M");
 
-local day = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"),"d");
+    local day = ds.datetime.format(ds.datetime.changeTimeZone(ds.datetime.now(), "Asia/Rangoon"),"d");
 
-local installmentsWoSummaryLine =if (ds.sizeOf(installments)>1)
-					then ds.arrays.drop(installments,1) //strip first summary line
-					else [];
+    local installmentsWoSummaryLine =if (ds.sizeOf(installments)>1)
+                        then ds.arrays.drop(installments,1) //strip first summary line
+                        else [];
 
-local overdueAmount = if(payload.status.closed == false) then payload.summary.totalOverdue else 0;
+    local overdueAmount = if(payload.status.closed == false) then payload.summary.totalOverdue else 0;
 
-local currentDueArr= if overdueAmount > 0 then
-			 std.filter(function(i)
-			 std.toString(i.dueDate[0]) == year &&
-			 std.toString(i.dueDate[1]) == month &&
-			 std.toString(i.dueDate[2]) == day, installmentsWoSummaryLine)
-			 else 0;
+    local currentDueArr= if overdueAmount > 0 then
+                 std.filter(function(i)
+                 std.toString(i.dueDate[0]) == year &&
+                 std.toString(i.dueDate[1]) == month &&
+                 std.toString(i.dueDate[2]) == day, installmentsWoSummaryLine)
+                 else 0;
 
-local currentDueAmount = if (currentDueArr != []) then currentDueArr[0].totalOutstandingForPeriod else 0 ;
+    local currentDueAmount = if (currentDueArr != []) then currentDueArr[0].totalOutstandingForPeriod else 0 ;
 
-local unpaidInstallments = if(payload.status.closed == false) && (overdueAmount == 0) then std.filter(function(i) i.complete == false, installmentsWoSummaryLine) else [];
+    local unpaidInstallments = if(payload.status.closed == false) && (overdueAmount == 0) then std.filter(function(i) i.complete == false, installmentsWoSummaryLine) else [];
 
-local futurDueDateArr = if (unpaidInstallments != []) then unpaidInstallments[0].dueDate else [];
+    local futurDueDateArr = if (unpaidInstallments != []) then unpaidInstallments[0].dueDate else [];
 
-local parseDueDateFromDateArr(dueArr)=
-					if (ds.sizeOf(dueArr)==3) then
-						std.toString(dueArr[0])+"-"+
-						(if futurDueDateArr[1] <10 then "0"+std.toString(futurDueDateArr[1]) else std.toString (futurDueDateArr[1]))
-						+"-"+
-					 (if futurDueDateArr[2] <10 then "0"+std.toString(futurDueDateArr[2]) else std.toString (futurDueDateArr[2]))
-					else "";
+    local parseDueDateFromDateArr(dueArr)=
+                        if (ds.sizeOf(dueArr)==3) then
+                            std.toString(dueArr[0])+"-"+
+                            (if futurDueDateArr[1] <10 then "0"+std.toString(futurDueDateArr[1]) else std.toString (futurDueDateArr[1]))
+                            +"-"+
+                         (if futurDueDateArr[2] <10 then "0"+std.toString(futurDueDateArr[2]) else std.toString (futurDueDateArr[2]))
+                        else "";
 
-local futureDueDate = parseDueDateFromDateArr(futurDueDateArr);
+    local futureDueDate = parseDueDateFromDateArr(futurDueDateArr);
 
-local futureDueAmount = if (unpaidInstallments != []) then unpaidInstallments[0].totalOutstandingForPeriod else 0;
+    local futureDueAmount = if (unpaidInstallments != []) then unpaidInstallments[0].totalOutstandingForPeriod else 0;
 
-local dueDate = if (payload.status.closed == false) && (overdueAmount > 0) then std.toString(curDate)
-				else if (payload.status.closed == false) && (overdueAmount == 0) then std.toString(futureDueDate)
-				else "";
+    local dueDate = if (payload.status.closed == false) && (overdueAmount > 0) then std.toString(curDate)
+                    else if (payload.status.closed == false) && (overdueAmount == 0) then std.toString(futureDueDate)
+                    else "";
 
-local dueAmount = if (payload.status.closed == false) && (overdueAmount > 0) then overdueAmount+currentDueAmount
-				else if (payload.status.closed == false) && (overdueAmount == 0) then futureDueAmount
-				else 0;
+    local dueAmount = if (payload.status.closed == false) && (overdueAmount > 0) then overdueAmount+currentDueAmount
+                    else if (payload.status.closed == false) && (overdueAmount == 0) then futureDueAmount
+                    else 0;
 
-local dueAmountString = if dueAmount >= 0 then std.toString(dueAmount) else "";
-
-if message !="" then
-{
-           "idType": "ACCOUNT_ID",
-           "idValue": loanId,
-		   "lastName" : cml.exchangeProperty("lastName"),
-           "displayName": cml.exchangeProperty("lastName"),
-           "extensionList": [
-              {
-                 "key":"mfiName",
-                 "value":cml.header("MFIName")
-              },
-              {
-                 "key":"amountDue",
-                 "value":dueAmountString
-              },
-              {
-                 "key":"branchName",
-                 "value":cml.exchangeProperty("branchName")
-              },
-              {
-                 "key":"errorMessage",
-                 "value":message
-              }
-           ]
- }
+    local dueAmountString = if dueAmount >= 0 then std.toString(dueAmount) else "";
+    {
+       "idType": "ACCOUNT_ID",
+       "idValue": idValue,
+       "idSubValue": idSubValue,
+       "lastName" : cml.exchangeProperty("lastName"),
+       "displayName": cml.exchangeProperty("lastName"),
+       "extensionList": [
+    	  {
+    		 "key":"mfiName",
+    		 "value":cml.header("MFIName")
+    	  },
+    	  {
+    		 "key":"amountDue",
+    		 "value":dueAmountString
+    	  },
+    	  {
+    		"key":"dueDate",
+    		"value":dueDate
+          },
+    	  {
+    		 "key":"branchName",
+    		 "value":cml.exchangeProperty("branchName")
+    	  }
+        ]
+    }
 else
-{
-   "idType": "ACCOUNT_ID",
-   "idValue": loanId,
-   "lastName" : cml.exchangeProperty("lastName"),
-   "displayName": cml.exchangeProperty("lastName"),
-   "extensionList": [
-	  {
-		 "key":"mfiName",
-		 "value":cml.header("MFIName")
-	  },
-	  {
-		 "key":"amountDue",
-		 "value":dueAmountString
-	  },
-	  {
-		"key":"dueDate",
-		"value":dueDate
-      },
-	  {
-		 "key":"branchName",
-		 "value":cml.exchangeProperty("branchName")
-	  }
-	]
-}
+    {
+       "idType": "ACCOUNT_ID",
+       "idValue": idValue,
+       "idSubValue": idSubValue,
+       "lastName" : cml.exchangeProperty("lastName"),
+       "displayName": cml.exchangeProperty("lastName"),
+       "extensionList": [
+          {
+             "key":"mfiName",
+             "value":cml.header("MFIName")
+          },
+          {
+             "key":"amountDue",
+             "value":"0"
+          },
+          {
+             "key":"branchName",
+             "value":cml.exchangeProperty("branchName")
+          },
+          {
+             "key":"errorMessage",
+             "value":errorMessage
+          }
+       ]
+    }
