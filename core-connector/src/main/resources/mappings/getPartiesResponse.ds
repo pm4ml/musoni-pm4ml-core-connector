@@ -63,24 +63,24 @@ if errorMessage == "" then
        "idType": "ACCOUNT_ID",
        "idValue": idValue,
        "idSubValue": idSubValue,
-       "lastName" : cml.exchangeProperty("lastName"),
+       "lastName": cml.exchangeProperty("lastName"),
        "displayName": cml.exchangeProperty("lastName"),
        "extensionList": [
     	  {
-    		 "key":"mfiName",
-    		 "value":cml.header("MFIName")
+    		 "key": "mfiName",
+    		 "value": cml.header("MFIName")
     	  },
     	  {
-    		 "key":"amountDue",
-    		 "value":dueAmountString
+    		 "key": "amountDue",
+    		 "value": dueAmountString
     	  },
     	  {
-    		"key":"dueDate",
-    		"value":dueDate
+    		"key": "dueDate",
+    		"value": dueDate
           },
     	  {
-    		 "key":"branchName",
-    		 "value":cml.exchangeProperty("branchName")
+    		 "key": "branchName",
+    		 "value": cml.exchangeProperty("branchName")
     	  }
         ]
     }
@@ -89,24 +89,24 @@ else
        "idType": "ACCOUNT_ID",
        "idValue": idValue,
        "idSubValue": idSubValue,
-       "lastName" : cml.exchangeProperty("lastName"),
+       "lastName": cml.exchangeProperty("lastName"),
        "displayName": cml.exchangeProperty("lastName"),
        "extensionList": [
           {
-             "key":"mfiName",
-             "value":cml.header("MFIName")
+             "key": "mfiName",
+             "value": cml.header("MFIName")
           },
           {
-             "key":"amountDue",
-             "value":"0"
+             "key": "amountDue",
+             "value": "0"
           },
           {
-             "key":"branchName",
-             "value":cml.exchangeProperty("branchName")
+             "key": "branchName",
+             "value": cml.exchangeProperty("branchName")
           },
           {
-             "key":"errorMessage",
-             "value":errorMessage
+             "key": "errorMessage",
+             "value": errorMessage
           }
        ]
     }
