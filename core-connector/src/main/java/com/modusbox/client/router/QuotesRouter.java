@@ -51,13 +51,13 @@ public class QuotesRouter extends RouteBuilder {
 				.to("direct:getAuthHeader")
 				.setHeader(Exchange.HTTP_METHOD, constant("GET"))
 				.log("Before calling: ${header.idValueTrimmed}")
-				.toD("{{dfsp.host}}/v1/loans/${header.idValueTrimmed}?associations=repaymentSchedule")
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Response from Musoni LoanLookup API: ${body}', " +
 						"'Tracking the response', 'Verify the response', null)")
 
 				.log("Musoni response,${body}")
 				.setProperty("origPayload", simple("${body}"))
+				.marshal().json()
 				.transform(datasonnet("resource:classpath:mappings/postQuoterequestsResponse.ds"))
 				.setBody(simple("${body.content}"))
 				.marshal().json()
