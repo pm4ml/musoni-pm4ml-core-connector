@@ -1003,7 +1003,7 @@ components:
           $ref: '#/components/schemas/fspId'
           description: FSP ID (if known).
         extensionList:
-          $ref: '#/components/schemas/extensionList'
+          $ref: '#/components/schemas/extensionListComplex'
           description: Optional extension, specific to deployment.
       required:
         - partyIdType
