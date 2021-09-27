@@ -24,7 +24,8 @@ public class CustomErrorProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        String reasonText = "{ \"statusCode\": \"5000\"," +
+        String reasonText = "{ " + "\"httpStatusCode\": \"500\"," +
+                "\"statusCode\": \"5000\"," +
                 "\"message\": \"Unknown\" }";
         String statusCode = "5000";
         int httpResponseCode = 500;
@@ -69,7 +70,8 @@ public class CustomErrorProcessor implements Processor {
                         statusCode = String.valueOf(errorResponse.getInt("statusCode"));
                         errorDescription = errorResponse.getString("description");
                     }
-                    reasonText = "{ \"statusCode\": \"" + statusCode + "\"," +
+                    reasonText = "{ " + "\"httpStatusCode\": \"" + String.valueOf(httpResponseCode) + "\"," +
+                            "\"statusCode\": \"" + statusCode + "\"," +
                             "\"message\": \"" + errorDescription + "\"} ";
                 }
             } else {
@@ -88,7 +90,8 @@ public class CustomErrorProcessor implements Processor {
                     errorResponse = errorResponse.getJSONObject("errorInformation");
                     statusCode = String.valueOf(errorResponse.getInt("statusCode"));
                     errorDescription = errorResponse.getString("description");
-                    reasonText = "{ \"statusCode\": \"" + statusCode + "\"," +
+                    reasonText = "{ " + "\"httpStatusCode\": \"" + String.valueOf(httpResponseCode) + "\"," +
+                            "\"statusCode\": \"" + statusCode + "\"," +
                             "\"message\": \"" + errorDescription + "\"} ";
                 }
             }
