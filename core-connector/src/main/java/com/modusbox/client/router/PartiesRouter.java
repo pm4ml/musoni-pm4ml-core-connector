@@ -96,7 +96,7 @@ public class PartiesRouter extends RouteBuilder {
         from("direct:searchClientIdByPhNo")
                 .to("direct:getAuthHeader")
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-                .toD("{{dfsp.host}}/v1/search?query=${header.idSubValue}&tenantIdentifier=demo&pretty=true&resource=clients")
+                .toD("{{dfsp.host}}/v1/search?query=${header.idSubValue}&tenantIdentifier={{dfsp.tenant-id}}&pretty=true&resource=clients")
                 .unmarshal().json()
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Response from Musoni Loan API with idsubValue , ${body}', " +
