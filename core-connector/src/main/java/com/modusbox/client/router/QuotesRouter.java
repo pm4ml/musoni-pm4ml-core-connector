@@ -1,8 +1,10 @@
 package com.modusbox.client.router;
 
+import com.modusbox.client.customexception.CCCustomException;
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
 import com.modusbox.client.processor.SetPropertiesForPostQuote;
 import com.modusbox.client.processor.TrimIdValueFromToQuoteRequest;
+import com.modusbox.client.validator.RoundingValidator;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
@@ -26,6 +28,7 @@ public class QuotesRouter extends RouteBuilder {
 	private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
 	private final TrimIdValueFromToQuoteRequest trimMFICode = new TrimIdValueFromToQuoteRequest();
 	private final SetPropertiesForPostQuote setPropertiesPostQuote = new SetPropertiesForPostQuote();
+	private final RoundingValidator roundingValidator = new RoundingValidator();
 
 	public void configure() {
 		// Add our global exception handling strategy
@@ -47,6 +50,7 @@ public class QuotesRouter extends RouteBuilder {
 				.process(trimMFICode)
 
 				.process(setPropertiesPostQuote)
+				.process(roundingValidator)
 
 				.to("direct:getAuthHeader")
 				.setHeader(Exchange.HTTP_METHOD, constant("GET"))
@@ -67,6 +71,9 @@ public class QuotesRouter extends RouteBuilder {
 				/*
 				 * END processing
 				 */
+				.doCatch(CCCustomException.class)
+					.log("Exception Caught")
+					.to("direct:extractCustomErrors")
 				.doFinally().process(exchange -> {
 					((Histogram.Timer) exchange.getProperty(TIMER_NAME)).observeDuration(); // stop Prometheus Histogram metric
 				}).end()
