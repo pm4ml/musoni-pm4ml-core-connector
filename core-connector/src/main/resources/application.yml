@@ -30,6 +30,7 @@ dfsp:
   tenant-id: id
   channel-id: 123
   api-key: key
+  roundingvalue: 100
 
 ### properties for Mojaloop Connector connection
 ml-conn:

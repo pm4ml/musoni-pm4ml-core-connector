@@ -11,11 +11,13 @@ public class RoundingValidator implements Processor {
     public void process(Exchange exchange) throws Exception {
 
         float amount =  Float.parseFloat((String) exchange.getProperty("amount"));
-        System.out.println("Amount in request body:"+amount);
-        System.out.println("Constant Rounding Value:"+Constants.ROUNDING_VALUE);
+        short roundingValue = Short.parseShort((String)exchange.getProperty("roundingvalue"));
 
-        if ((amount%Constants.ROUNDING_VALUE) != 0) {
-            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.GENERIC_ID_NOT_FOUND, "Rounding Error"));
+        System.out.println("Amount in request body:"+amount);
+        System.out.println ("Rounding Value:"+roundingValue);
+
+        if ((amount%roundingValue) != 0) {
+            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.GENERIC_ID_NOT_FOUND, "Amount is invalid. Please enter the amount in multiple of 100. ( e.g. 100, 200, 300, etc)"));
         }
     }
 }

@@ -1,4 +1,4 @@
-local mfiName = {"key": "mfiName", "value": "VisionFund"};
+local mfiName = {"key": "mfiName", "value": cml.header("MFIName")};
 local newExtensionList = if std.objectHas(payload.from, "extensionList")
 then {"extensionList": [mfiName] + payload.from.extensionList}
 else {"extensionList": [mfiName]};

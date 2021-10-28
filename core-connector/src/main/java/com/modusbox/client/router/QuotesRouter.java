@@ -47,8 +47,9 @@ public class QuotesRouter extends RouteBuilder {
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Request received, POST /quoterequests', " +
 						"null, null, 'Input Payload: ${body}')")
-				.process(trimMFICode)
+				.setProperty("roundingvalue", constant("{{dfsp.roundingvalue}}"))
 
+				.process(trimMFICode)
 				.process(setPropertiesPostQuote)
 				.process(roundingValidator)
 
@@ -61,6 +62,8 @@ public class QuotesRouter extends RouteBuilder {
 
 				.log("Musoni response,${body}")
 				.setProperty("origPayload", simple("${body}"))
+
+
 				.marshal().json()
 				.transform(datasonnet("resource:classpath:mappings/postQuoterequestsResponse.ds"))
 				.setBody(simple("${body.content}"))
