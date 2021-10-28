@@ -50,6 +50,7 @@ public class SendmoneyRouter extends RouteBuilder {
                 .removeHeaders("CamelHttp*")
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader("Content-Type", constant("application/json"))
+                .setHeader("MFIName", constant("{{dfsp.name}}"))
 
                 // Prune empty items from the request
                 .marshal().json()
