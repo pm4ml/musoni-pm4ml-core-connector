@@ -60,32 +60,7 @@ public class TransfersRouter extends RouteBuilder {
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Request received, POST /Transfer', " +
                         "null, null, 'Input Payload: ${body}')")
-                /*
-                 * END processing
-                 */
 
-
-                .doFinally().process(exchange -> {
-                    ((Histogram.Timer) exchange.getProperty(TIMER_NAME_POST)).observeDuration(); // stop Prometheus Histogram metric
-                }).end()
-        ;
-
-
-        // POST /transfers to send the bill payment
-        from("direct:putTransfersByTransferId").routeId("com.modusbox.putTransfersByTransferId").doTry()
-                .process(exchange -> {
-                    reqCounterPut.inc(1); // increment Prometheus Counter metric
-                    exchange.setProperty(TIMER_NAME_PUT, reqLatencyPut.startTimer()); // initiate Prometheus Histogram metric
-                })
-                /*
-                 * BEGIN processing
-                 */
-                .log("Request transfer API called (loan repayment)")
-                .log("PUT /transfers/{transferId}")
-                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Request received, PUT /transfers/{transferId}', " +
-                        "null, null, 'Input Payload: ${body}')")
-                .log("Header transferID,${header.transferId}")
                 .process(trimMFICode)
                 // Prepare Request Body for Make Repayment Call
                 .setHeader("MMDWalletChannelId",constant("{{dfsp.channel-id}}"))
@@ -119,13 +94,39 @@ public class TransfersRouter extends RouteBuilder {
                 .log("loanTransactionId in Header: ${exchangeProperty.loanTransactionId}")
                 .log("makeRepaymentResponse,${body}")
                 .to("direct:choiceRoute")
+                .removeHeaders("*", "X-*")
 
                 .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class)
-                    .log("HttpOperationFailedException Caught")
-                    .to("direct:extractCustomErrors")
-        /*
-         * END processing
-         */
+                .log("Exception Caught")
+                .to("direct:extractCustomErrors")
+                /*
+                 * END processing
+                 */
+                .doFinally().process(exchange -> {
+                    ((Histogram.Timer) exchange.getProperty(TIMER_NAME_POST)).observeDuration(); // stop Prometheus Histogram metric
+                }).end()
+        ;
+
+
+        // POST /transfers to send the bill payment
+        from("direct:putTransfersByTransferId").routeId("com.modusbox.putTransfersByTransferId").doTry()
+                .process(exchange -> {
+                    reqCounterPut.inc(1); // increment Prometheus Counter metric
+                    exchange.setProperty(TIMER_NAME_PUT, reqLatencyPut.startTimer()); // initiate Prometheus Histogram metric
+                })
+                /*
+                 * BEGIN processing
+                 */
+                .log("Request transfer API called (loan repayment)")
+                .log("PUT /transfers/{transferId}")
+                .log("Header transferID,${header.transferId}")
+                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                        "'Request received, PUT /transfers/{transferId}', " +
+                        "null, null, 'Input Payload: ${body}')")
+                .removeHeaders("*", "X-*")
+                /*
+                 * END processing
+                 */
                 .doFinally().process(exchange -> {
                     ((Histogram.Timer) exchange.getProperty(TIMER_NAME_PUT)).observeDuration(); // stop Prometheus Histogram metric
                 }).end()
