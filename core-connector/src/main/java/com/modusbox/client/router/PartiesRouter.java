@@ -71,7 +71,7 @@ public class PartiesRouter extends RouteBuilder {
                 .log("Idvalue without Zeros Leading: ${exchangeProperty.idValueWithoutZeros}")
                 .log("LastName: ${exchangeProperty.lastName}")
                 .log("BranchName: ${exchangeProperty.branchName}")
-                .log("rejectCodes: ${exchangeProperty.rejectCodes}")
+                .log("LoanStatusWhitelist: ${exchangeProperty.loanStatusWhitelist}")
                 .log("entityStatusID: ${exchangeProperty.entityStatusID}")
                 .log("entityStatusValue: ${exchangeProperty.entityStatusValue}")
 
