@@ -3,6 +3,8 @@ package com.modusbox.client.processor;
 import com.modusbox.client.model.QuoteRequest;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import com.modusbox.client.customexception.CCCustomException;
+import com.modusbox.client.enums.ErrorCode;
 
 public class SetPropertiesForPostQuote implements Processor {
 
@@ -19,5 +21,9 @@ public class SetPropertiesForPostQuote implements Processor {
         exchange.setProperty("transactionId", transactionId);
         exchange.setProperty("amount", amount);
         exchange.setProperty("expiration", expiration);
+
+        if (amount.equals("0")){
+            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.PAYEE_LIMIT_ERROR, "Transfer amount cannot be zero value"));
+        }
     }
 }
