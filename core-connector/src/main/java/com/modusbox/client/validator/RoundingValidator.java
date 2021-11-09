@@ -17,7 +17,7 @@ public class RoundingValidator implements Processor {
         System.out.println ("Rounding Value:"+roundingValue);
 
         if ((amount%roundingValue) != 0) {
-            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.GENERIC_ID_NOT_FOUND, "Amount is invalid. Please enter the amount in multiple of 100. ( e.g. 100, 200, 300, etc)"));
+            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.PAYEE_LIMIT_ERROR, "Amount is invalid. Please enter the amount in multiple of 100. ( e.g. 100, 200, 300, etc)"));
         }
     }
 }

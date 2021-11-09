@@ -59,7 +59,7 @@ public class CustomErrorProcessor implements Processor {
                             JSONArray arayObject = respObject.getJSONArray("errors");
                             JSONObject errorObject = (JSONObject) arayObject.get(0);
                             errorDescription = errorObject.getString("defaultUserMessage");
-                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, StringUtils.parseJsonString(errorDescription)));
+                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE, StringUtils.parseJsonString(errorDescription)));
                         }
                     }
                 } finally {
