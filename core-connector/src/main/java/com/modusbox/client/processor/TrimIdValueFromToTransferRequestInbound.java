@@ -16,8 +16,8 @@ public class TrimIdValueFromToTransferRequestInbound implements Processor {
         String idValueTrimmed = transferRequestInbound.getTo().getIdValue();
 
         String mfiCode = StringUtils.trimMfiCode(idValueTrimmed, Constants.TRIM_COUNT);
-        exchange.getIn().setHeader("mfiCode: ", mfiCode);
-        System.out.println("mfiCode "+mfiCode);
+        exchange.getIn().setHeader("mfiCode", mfiCode);
+        System.out.println("mfiCode: "+mfiCode);
         idValueTrimmed = StringUtils.trimIdValue(idValueTrimmed, Constants.TRIM_COUNT);
         exchange.getIn().setHeader("idValueTrimmed", idValueTrimmed);
         System.out.println("idValueTrimmed: "+idValueTrimmed);
