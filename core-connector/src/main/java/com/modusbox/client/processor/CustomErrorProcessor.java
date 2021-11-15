@@ -9,6 +9,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.http.base.HttpOperationFailedException;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.HttpHostConnectException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,6 +61,17 @@ public class CustomErrorProcessor implements Processor {
                             JSONObject errorObject = (JSONObject) arayObject.get(0);
                             errorDescription = errorObject.getString("defaultUserMessage");
                             errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE, StringUtils.parseJsonString(errorDescription)));
+                        }   // Disbursement Error Handling
+                         else if(respObject.has("message") && respObject.has("transferState")){
+                            statusCode = String.valueOf(respObject.getInt("statusCode"));
+                            try {
+                                errorDescription = respObject.getJSONObject("transferState").getJSONObject("lastError").getJSONObject("mojaloopError").getJSONObject("errorInformation").getString("errorDescription");
+                            }catch (JSONException ex) {
+                                errorDescription = "Unknown - no mojaloopError message present";
+                            }
+
+                        } else {
+                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE));
                         }
                     }
                 } finally {
@@ -78,10 +90,12 @@ public class CustomErrorProcessor implements Processor {
                         errorResponse = new JSONObject(exception.getMessage());
                     } else if (exception instanceof InternalServerErrorException) {
                         errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
-                    } else if (exception instanceof ConnectTimeoutException || exception instanceof SocketTimeoutException) {
+                    } else if (exception instanceof ConnectTimeoutException || exception instanceof SocketTimeoutException || exception instanceof HttpHostConnectException) {
                         errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.SERVER_TIMED_OUT));
                     } else if (exception instanceof JSONException) {
                         errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, StringUtils.parseJsonString(exception.getMessage())));
+                    } else {
+                        errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE));
                     }
                 } finally {
                     httpResponseCode = errorResponse.getInt("errorCode");
