@@ -4,6 +4,7 @@ import com.modusbox.client.customexception.CCCustomException;
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
 import com.modusbox.client.processor.SetPropertiesForClientInfo;
 import com.modusbox.client.processor.SetPropertiesForLoanInfo;
+import com.modusbox.client.validator.IdSubValueChecker;
 import com.modusbox.client.validator.ValidatePhoneNumber;
 import com.modusbox.client.processor.TrimIdValueFromHeader;
 import io.prometheus.client.Counter;
@@ -32,11 +33,36 @@ public class PartiesRouter extends RouteBuilder {
     private final SetPropertiesForLoanInfo setPropertiesForLoanInfo = new SetPropertiesForLoanInfo();
     private final SetPropertiesForClientInfo setPropertiesForClientInfo = new SetPropertiesForClientInfo();
     private final ValidatePhoneNumber validatePhoneNumber = new ValidatePhoneNumber();
+    private final IdSubValueChecker idSubValueChecker = new IdSubValueChecker();
 
     public void configure() {
 
         // Add our global exception handling strategy
         exceptionHandlingConfigurer.configureExceptionHandling(this);
+
+        from("direct:getPartiesByIdTypeIdValue").routeId("com.modusbox.getPartiesByIdTypeIdValue").doTry()
+                .process(exchange -> {
+                    reqCounter.inc(1); // increment Prometheus Counter metric
+                    exchange.setProperty(TIMER_NAME, reqLatency.startTimer()); // initiate Prometheus Histogram metric
+                })
+
+                .to("bean:customJsonMessage?method=logJsonMessage(" +
+                        "'info', " +
+                        "${header.X-CorrelationId}, " +
+                        "'Request received GET /parties/${header.idType}/${header.idValue}', " +
+                        "'Tracking the request', " +
+                        "'Call the Musoni API,  Track the response', " +
+                        "'Input Payload: ${body}')") // default logger
+                /*
+                 * BEGIN processing
+                 */
+                .process(idSubValueChecker)
+                .doCatch(CCCustomException.class)
+                    .to("direct:extractCustomErrors")
+                .doFinally().process(exchange -> {
+            ((Histogram.Timer) exchange.getProperty(TIMER_NAME)).observeDuration(); // stop Prometheus Histogram metric
+        }).end()
+        ;
 
         // In this case the GET parties will return the loan account with customer details
         from("direct:getPartiesByIdTypeIdValueIdSubValue").routeId("com.modusbox.getPartiesByIdTypeIdValueIdSubValue").doTry()
