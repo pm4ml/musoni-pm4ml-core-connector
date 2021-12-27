@@ -8,7 +8,7 @@ info:
   license:
     name: Apache License Version 2.0, January 2004
     url: http://www.apache.org/licenses/
-  version: 1.8.0
+  version: 1.8.2
 
 
 paths:
@@ -27,7 +27,7 @@ paths:
             application/json:
               schema:
                 type: string
-
+                
   /loanDisbursementToWallet:
     post:
       summary: mifos loan disbursment
@@ -48,7 +48,7 @@ paths:
           $ref: '#/components/responses/transferServerError'
         504:
           $ref: '#/components/responses/transferTimeout'
-
+          
   /sendmoney:
     post:
       summary: Sends money from one account to another
@@ -217,6 +217,27 @@ paths:
           $ref: '#/components/responses/500'
 
   /transfers/{transferId}:
+    get:
+      summary: Requests status relating to a transfer
+      operationId: getTransfersByTransferId
+      description: The HTTP request `GET /transfers/{transferId}` is sent to the Hub by the DFSP, and it is used to look up information regarding the given transfer, identified by `{transferId}`.
+      tags:
+        - transfers
+      parameters:
+        - $ref: '#/components/parameters/transferId'
+      responses:
+        200:
+          description: Response containing status of the requested transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mojaloopTransferState'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
     put:
       summary: Provides a notification about the success/failure of a specific transfer
       operationId: putTransfersByTransferId
@@ -1149,6 +1170,9 @@ components:
         expiration:
           $ref: '#/components/schemas/timestamp'
           description: An optional deadline for responding to the quote request.
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+          description: Optional extension, specific to deployment.
 
     quoteResponse:
       type: object
@@ -1489,6 +1513,9 @@ components:
         note:
           maxLength: 128
           type: string
+        extensionList:
+          $ref: '#/components/schemas/extensionList'
+          description: Optional extension, specific to deployment.
 
     transferResponse:
       type: object
@@ -1507,9 +1534,7 @@ components:
         from:
           $ref: '#/components/schemas/transferParty'
         to:
-          type: array
-          items:
-            $ref: '#/components/schemas/transferParty'
+          $ref: '#/components/schemas/transferParty'
         #          oneOf:
         #            - $ref: '#/components/schemas/transferParty'
         #            - type: array
@@ -1641,7 +1666,7 @@ components:
 
     transferResponseInbound:
       type: object
-        #required:
+      #required:
       #- homeTransactionId
       properties:
         homeTransactionId:
