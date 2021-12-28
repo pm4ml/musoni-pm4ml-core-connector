@@ -2,10 +2,9 @@ package com.modusbox.client.jaxrs;
 
 import com.modusbox.client.api.TransfersApi;
 import com.modusbox.client.model.*;
+import javax.validation.constraints.Pattern;
 
-public class TransfersApiImpl implements TransfersApi{
-
-
+public class TransfersApiImpl implements TransfersApi {
     @Override
     public TransferResponseInbound postTransfers(TransferRequestInbound transferRequestInbound) {
         return null;
@@ -13,6 +12,11 @@ public class TransfersApiImpl implements TransfersApi{
 
     @Override
     public TransferResponseInbound putTransfersByTransferId(String transferId, FulfilNotification fulfilNotification) {
+        return null;
+    }
+
+    @Override
+    public MojaloopTransferState getTransfersByTransferId(@Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$") String transferId) {
         return null;
     }
 
