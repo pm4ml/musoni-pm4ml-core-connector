@@ -1,6 +1,5 @@
 package com.modusbox.client.validator;
 
-import com.modusbox.client.common.Constants;
 import com.modusbox.client.customexception.CCCustomException;
 import com.modusbox.client.enums.ErrorCode;
 import org.apache.camel.Exchange;
@@ -17,7 +16,7 @@ public class RoundingValidator implements Processor {
         System.out.println ("Rounding Value:"+roundingValue);
 
         if ((amount%roundingValue) != 0) {
-            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.PAYEE_LIMIT_ERROR, "Amount is invalid. Please enter the amount in multiple of 100. ( e.g. 100, 200, 300, etc)"));
+            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.ROUNDING_VALUE_ERROR, ErrorCode.ROUNDING_VALUE_ERROR.getDefaultMessage().replace("XXXX",String.valueOf(roundingValue))));
         }
     }
 }
