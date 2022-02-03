@@ -16,7 +16,7 @@ public class TransfersApiImpl implements TransfersApi {
     }
 
     @Override
-    public MojaloopTransferState getTransfersByTransferId(@Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$") String transferId) {
+    public TransferStatusResponse getTransfersByTransferId(@Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$") String transferId) {
         return null;
     }
 
