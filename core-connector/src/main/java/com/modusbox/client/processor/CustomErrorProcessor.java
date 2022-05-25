@@ -54,7 +54,21 @@ public class CustomErrorProcessor implements Processor {
                             errorDescription = respObject.getString("returnStatus");
                         } else if (e.getStatusCode() == 401 || e.getStatusCode() == 403) {
                             errorFlag = true;
-                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.DESTINATION_COMMUNICATION_ERROR,StringUtils.parseJsonString(respObject.getString("message"))));
+                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.DESTINATION_COMMUNICATION_ERROR, StringUtils.parseJsonString(respObject.getString("message"))));
+                        }else if (respObject.has("errors")) {
+                                errorFlag = true;
+                            JSONArray arayObject = respObject.getJSONArray("errors");
+                            JSONObject errorObject = (JSONObject) arayObject.get(0);
+                            errorDescription = errorObject.getString("defaultUserMessage");
+                            if(errorDescription.contains("PaymentType") && errorDescription.contains("does not exist"))
+                            {
+                                errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.PAYMENT_TYPE_NOT_FOUND, StringUtils.parseJsonString(errorDescription)));
+                            }
+                            else
+                            {
+
+                                errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE, StringUtils.parseJsonString(errorDescription)));
+                            }
                         } else if (respObject.has("errors")) {
                             errorFlag = true;
                             JSONArray arayObject = respObject.getJSONArray("errors");
