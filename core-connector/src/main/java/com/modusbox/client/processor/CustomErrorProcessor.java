@@ -69,13 +69,7 @@ public class CustomErrorProcessor implements Processor {
 
                                 errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE, StringUtils.parseJsonString(errorDescription)));
                             }
-                        } else if (respObject.has("errors")) {
-                            errorFlag = true;
-                            JSONArray arayObject = respObject.getJSONArray("errors");
-                            JSONObject errorObject = (JSONObject) arayObject.get(0);
-                            errorDescription = errorObject.getString("defaultUserMessage");
-                            errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE, StringUtils.parseJsonString(errorDescription)));
-                        }   // Disbursement Error Handling
+                        }
                          else if(respObject.has("message") && respObject.has("transferState")){
                             statusCode = String.valueOf(respObject.getInt("statusCode"));
                             try {
