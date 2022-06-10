@@ -62,7 +62,7 @@ public class CustomErrorProcessor implements Processor {
                             errorDescription = errorObject.getString("defaultUserMessage");
                             if(errorDescription.contains("PaymentType") && errorDescription.contains("does not exist"))
                             {
-                                errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.PAYMENT_TYPE_NOT_FOUND, StringUtils.parseJsonString(errorDescription)));
+                                errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.ROUNDING_VALUE_ERROR, StringUtils.parseJsonString(errorDescription)));
                             }
                             else
                             {
