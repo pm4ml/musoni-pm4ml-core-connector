@@ -16,7 +16,7 @@ public class RoundingValidator implements Processor {
         System.out.println ("Rounding Value:"+roundingValue);
 
         if ((amount%roundingValue) != 0) {
-            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.PAYMENT_TYPE_NOT_FOUND, ErrorCode.PAYMENT_TYPE_NOT_FOUND.getDefaultMessage().replace("XXXX",String.valueOf(roundingValue))));
+            throw new CCCustomException(ErrorCode.getErrorResponse(ErrorCode.ROUNDING_VALUE_ERROR, ErrorCode.ROUNDING_VALUE_ERROR.getDefaultMessage().replace("XXXX",String.valueOf(roundingValue))));
         }
     }
 }
