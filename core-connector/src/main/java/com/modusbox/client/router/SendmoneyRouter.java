@@ -1,6 +1,7 @@
 package com.modusbox.client.router;
 
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
+import com.modusbox.client.utils.Utility;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
@@ -55,6 +56,7 @@ public class SendmoneyRouter extends RouteBuilder {
                 .setHeader("Content-Type", constant("application/json"))
                 .setHeader("MFIName", constant("{{dfsp.name}}"))
 
+                .setProperty("amount",method(Utility.class, "stripTrailingZerosAfterDecimalPoint(${body.getAmount})"))
                 // Prune empty items from the request
                 .marshal().json()
                 .transform(datasonnet("resource:classpath:mappings/postSendMoneyRequest.ds"))

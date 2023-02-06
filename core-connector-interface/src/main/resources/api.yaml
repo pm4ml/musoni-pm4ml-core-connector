@@ -964,7 +964,7 @@ components:
         - ABORTED The Switch has aborted the transfer due a rejection or failure to perform the transfer.
 
     money:
-      pattern: ^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$
+      pattern: ^([0]|([1-9][0-9]{0,13}))([.][0-9]{0,3}[0-9])?$
       type: string
 
     Party:
