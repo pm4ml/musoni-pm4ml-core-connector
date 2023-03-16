@@ -14,6 +14,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.http.base.HttpOperationFailedException;
 import org.json.JSONException;
 
+import java.net.UnknownHostException;
+
 public class PartiesRouter extends RouteBuilder {
 
     private static final String TIMER_NAME = "histogram_get_parties_timer";
@@ -110,7 +112,7 @@ public class PartiesRouter extends RouteBuilder {
                  * END processing
                  */
 
-                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class)
+                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class, UnknownHostException.class)
                     .log("Exception Caught")
                     .to("direct:extractCustomErrors")
 
