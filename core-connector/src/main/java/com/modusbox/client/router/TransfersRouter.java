@@ -11,6 +11,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.http.base.HttpOperationFailedException;
 import org.json.JSONException;
 
+import java.net.UnknownHostException;
+
 
 public class TransfersRouter extends RouteBuilder {
 
@@ -107,7 +109,7 @@ public class TransfersRouter extends RouteBuilder {
                 .to("direct:choiceRoute")
                 .removeHeaders("*", "X-*")
 
-                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class)
+                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class, UnknownHostException.class)
                 .log("Exception Caught")
                 .to("direct:extractCustomErrors")
                 /*

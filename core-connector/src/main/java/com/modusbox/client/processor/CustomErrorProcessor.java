@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.InternalServerErrorException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 @Component("customErrorProcessor")
 public class CustomErrorProcessor implements Processor {
@@ -102,7 +103,12 @@ public class CustomErrorProcessor implements Processor {
                         errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.SERVER_TIMED_OUT));
                     } else if (exception instanceof JSONException) {
                         errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, StringUtils.parseJsonString(exception.getMessage())));
-                    } else {
+                    }
+                    else if (exception instanceof UnknownHostException)
+                    {
+                        errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.UNKNOWN_URI));
+                    }
+                    else {
                         errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE));
                     }
                 } finally {
