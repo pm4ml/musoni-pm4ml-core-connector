@@ -109,7 +109,7 @@ public class TransfersRouter extends RouteBuilder {
                 .to("direct:choiceRoute")
                 .removeHeaders("*", "X-*")
 
-                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class, UnknownHostException.class)
+                .doCatch(HttpOperationFailedException.class,CCCustomException.class, JSONException.class, Exception.class)
                 .log("Exception Caught")
                 .to("direct:extractCustomErrors")
                 /*
