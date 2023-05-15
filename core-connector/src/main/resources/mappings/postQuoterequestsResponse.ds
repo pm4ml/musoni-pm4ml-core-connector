@@ -2,10 +2,10 @@
     "quoteId":  cml.exchangeProperty('quoteId'),
     "transactionId":  cml.exchangeProperty('transactionId'),
     "transferAmount": cml.exchangeProperty('amount'),
-    "transferAmountCurrency": "MMK",
+    "transferAmountCurrency": cml.exchangeProperty('currency'),
 	"payeeFspFeeAmount": "0",
-	"payeeFspFeeAmountCurrency": "MMK",
+	"payeeFspFeeAmountCurrency": cml.exchangeProperty('currency'),
     "payeeFspCommissionAmount": "0",
-    "payeeFspCommissionAmountCurrency": "MMK",
+    "payeeFspCommissionAmountCurrency": cml.exchangeProperty('currency'),
     "expiration": cml.exchangeProperty('expiration')
 }
